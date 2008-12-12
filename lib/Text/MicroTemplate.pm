@@ -3,6 +3,8 @@
 
 package Text::MicroTemplate;
 
+require Exporter;
+
 use strict;
 use warnings;
 use constant DEBUG => $ENV{MICRO_TEMPLATE_DEBUG} || 0;
@@ -10,11 +12,13 @@ use constant DEBUG => $ENV{MICRO_TEMPLATE_DEBUG} || 0;
 use Carp 'croak';
 
 our $VERSION = '0.01';
+our @ISA = qw(Exporter);
+our @EXPORT_OK = qw(as_html);
 
 sub new {
     my $class = shift;
     return bless {
-        code                => '',
+        code                => undef,
         comment_mark        => '#',
         expression_mark     => '=',
         raw_expression_mark => '=r',
@@ -23,11 +27,18 @@ sub new {
         tree                => [],
         tag_start           => '<?',
         tag_end             => '?>',
-        escape_func         => undef,
+        escape_func         => 'Text::MicroTemplate::escape_html',
+        ref($_[0]) ? %{$_[0]} : @_,
     }, $class;
 }
 
-sub code { shift->{code} }
+sub code {
+    my $self = shift;
+    unless (defined $self->{code}) {
+        $self->build();
+    }
+    $self->{code};
+}
 
 sub escape_func { shift->{escape_func} }
 
@@ -282,6 +293,25 @@ sub _error {
 sub raw_string {
     my $s = shift;
     bless \$s, 'Text::MicroTemplate::RawString';
+}
+
+sub escape_html {
+    my $str = shift;
+    return $$str
+        if ref $str eq 'Text::MicroTemplate::raw_string';
+    $str =~ s/&/&amp;/g;
+    $str =~ s/>/&gt;/g;
+    $str =~ s/</&lt;/g;
+    $str =~ s/"/&quot;/g;
+    $str =~ s/'/&#39;/g;
+    return $str;
+}
+
+sub as_html {
+    my $t = shift;
+    my $mt = Text::MicroTemplate->new;
+    $mt->parse($t);
+    '((' . $mt->code . ')->())';
 }
 
 1;
