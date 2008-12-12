@@ -14,6 +14,9 @@ use Carp 'croak';
 our $VERSION = '0.01';
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(as_html);
+our %EXPORT_TAGS = (
+    all => [ @EXPORT_OK ],
+);
 
 sub new {
     my $class = shift;
