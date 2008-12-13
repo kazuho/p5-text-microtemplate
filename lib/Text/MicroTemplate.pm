@@ -20,19 +20,23 @@ our %EXPORT_TAGS = (
 
 sub new {
     my $class = shift;
-    return bless {
+    my $self = bless {
         code                => undef,
         comment_mark        => '#',
         expression_mark     => '=',
         raw_expression_mark => '=r',
         line_start          => '?',
-        template            => '',
+        template            => undef,
         tree                => [],
         tag_start           => '<?',
         tag_end             => '?>',
         escape_func         => 'Text::MicroTemplate::escape_html',
         ref($_[0]) ? %{$_[0]} : @_,
     }, $class;
+    if (defined $self->{template}) {
+        $self->parse($self->{template});
+    }
+    $self;
 }
 
 sub code {

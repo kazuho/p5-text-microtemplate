@@ -5,8 +5,7 @@ use Text::MicroTemplate;
 
 sub foo { '<hr />' }
 
-my $mt = Text::MicroTemplate->new;
-$mt->parse(<<'...');
+my $mt = Text::MicroTemplate->new(template => << '...');
 abc
 ?= foo()
 def
@@ -14,7 +13,6 @@ def
 ? 
 ghi
 ...
-print $mt->code();
 my $code = eval $mt->code();
 ok !$@, $mt->code();
 my $got = $code->();
