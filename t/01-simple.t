@@ -7,18 +7,22 @@ sub foo { '<hr />' }
 
 my $mt = Text::MicroTemplate->new;
 $mt->parse(<<'...');
+abc
 ?= foo()
+def
 ...
 my $code = eval $mt->code();
 ok !$@, $mt->code();
 my $got = $code->();
-is $got, '&lt;hr /&gt;';
+is $got, "abc\n&lt;hr /&gt;\ndef\n";
 
 $mt = Text::MicroTemplate->new(escape_func => undef);
 $mt->parse(<<'...');
+abc
 ?= foo()
+def
 ...
 $code = eval $mt->code();
 ok !$@, $mt->code();
 $got = $code->();
-is $got, '<hr />';
+is $got, "abc\n<hr />\ndef\n";

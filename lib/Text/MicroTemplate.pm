@@ -13,7 +13,7 @@ use Carp 'croak';
 
 our $VERSION = '0.01';
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(as_html);
+our @EXPORT_OK = qw(as_html raw_string);
 our %EXPORT_TAGS = (
     all => [ @EXPORT_OK ],
 );
@@ -119,8 +119,15 @@ sub parse {
     # Tokenize
     my $state = 'text';
     my $multiline_expression = 0;
-    for my $line (split /\n/, $tmpl) {
-
+    my @lines = split /(\n)/, $tmpl;
+    while (@lines) {
+        my $line = shift @lines;
+        my $newline = undef;
+        if (@lines) {
+            shift @lines;
+            $newline = 1;
+        }
+        
         # Perl line without return value
         if ($line =~ /^$line_start\s+(.+)$/) {
             push @{$self->{tree}}, ['code', $1];
@@ -130,14 +137,20 @@ sub parse {
 
         # Perl line with return value
         if ($line =~ /^$line_start$expr_mark\s+(.+)$/) {
-            push @{$self->{tree}}, ['expr', $1];
+            push @{$self->{tree}}, [
+                'expr', $1,
+                $newline ? ('text', "\n") : (),
+            ];
             $multiline_expression = 0;
             next;
         }
 
         # Perl line with raw return value
         if ($line =~ /^$line_start$raw_expr_mark\s+(.+)$/) {
-            push @{$self->{tree}}, ['raw_expr', $1];
+            push @{$self->{tree}}, [
+                'raw_expr', $1,
+                $newline ? ('text', "\n") : (),
+            ];
             $multiline_expression = 0;
             next;
         }
@@ -166,7 +179,7 @@ sub parse {
         }
 
         # Normal line ending
-        else { $line .= "\n" }
+        else { $line .= "\n" if $newline }
 
         # Mixed line
         my @token;
@@ -301,7 +314,7 @@ sub raw_string {
 sub escape_html {
     my $str = shift;
     return $$str
-        if ref $str eq 'Text::MicroTemplate::raw_string';
+        if ref $str eq 'Text::MicroTemplate::RawString';
     $str =~ s/&/&amp;/g;
     $str =~ s/>/&gt;/g;
     $str =~ s/</&lt;/g;
