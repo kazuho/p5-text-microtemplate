@@ -56,6 +56,7 @@ sub build {
     
     # Compile
     my @lines;
+    my $last_was_code;
     for my $line (@{$self->{tree}}) {
 
         # New line
@@ -66,6 +67,12 @@ sub build {
 
             # Need to fix line ending?
             my $newline = chomp $value;
+
+            # add semicolon to last line of code
+            if ($last_was_code && $type ne 'code') {
+                $lines[-1] .= ';';
+                undef $last_was_code;
+            }
 
             # Text
             if ($type eq 'text') {
@@ -79,7 +86,8 @@ sub build {
 
             # Code
             if ($type eq 'code') {
-                $lines[-1] .= "$value;";
+                $lines[-1] .= $value;
+                $last_was_code = 1;
             }
 
             # Expression
@@ -95,6 +103,11 @@ sub build {
         }
     }
 
+    # add semicolon to last line of code
+    if ($last_was_code) {
+        $lines[-1] .= ';';
+    }
+    
     # Wrap
     $lines[0] ||= '';
     $lines[0]   = q/sub { my $_MT = ''; my $_MT_T = '';/ . $lines[0];
