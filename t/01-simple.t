@@ -10,11 +10,15 @@ $mt->parse(<<'...');
 abc
 ?= foo()
 def
+? 
+? 
+ghi
 ...
+print $mt->code();
 my $code = eval $mt->code();
 ok !$@, $mt->code();
 my $got = $code->();
-is $got, "abc\n&lt;hr /&gt;\ndef\n";
+is $got, "abc\n&lt;hr /&gt;\ndef\nghi\n";
 
 $mt = Text::MicroTemplate->new(escape_func => undef);
 $mt->parse(<<'...');

@@ -129,7 +129,7 @@ sub parse {
         }
         
         # Perl line without return value
-        if ($line =~ /^$line_start\s+(.+)$/) {
+        if ($line =~ /^$line_start\s+(.*)$/) {
             push @{$self->{tree}}, ['code', $1];
             $multiline_expression = 0;
             next;
