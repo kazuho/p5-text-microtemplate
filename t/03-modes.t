@@ -1,8 +1,18 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 8;
 use Text::MicroTemplate qw(:all);
 
+# comment
+is eval as_html(<<'...'), "aaa\nbbb\n";
+aaa
+?# 
+bbb
+?# 
+...
+is eval as_html('aaa<?# a ?>bbb'), "aaabbb";
+
+# expression and raw expression
 do {
     my $s = 'foo<a';
     is eval as_html('<?= $s ?>'), 'foo&lt;a';
@@ -11,7 +21,6 @@ do {
     is eval as_html('<?= $rs ?>'), 'foo<a';
     is eval as_html('<?=r $rs ?>'), 'foo<a';
 };
-
 do {
     use utf8;
     my $s = 'い<';
