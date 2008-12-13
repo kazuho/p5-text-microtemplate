@@ -350,3 +350,69 @@ sub as_html {
 
 1;
 __END__
+
+=head1 NAME
+
+Text::MicroTemplate
+
+=head1 SYNOPSIS
+
+    use Text::MicroTemplate qw(as_html);
+
+    # simple form
+    my $user = 'John';
+    my $html = eval as_html('hello, <?= $user ?>')
+        or die $@;
+
+    # complex form
+    my $mt = Text::MicroTemplate->new(
+        template => 'hello, <?= $query->param('user') ?>,
+    );
+    my $code = $mt->code;
+    my $builder = eval << "..." or die $@;
+    sub {
+        my \$query = shift;
+        $code->();
+    }
+    ...
+    $builder->(CGI->new);
+
+=head1 DESCRIPTION
+
+Text::MicroTemplate is a fast, standalone, intelligent template engine based on Mojo::Template.
+
+=head1 SYNTAX
+
+not yet
+
+=head1 METHODS
+
+=head2 as_html
+
+not yet
+
+=head2 new
+
+not yet
+
+=head2 code
+
+not yet
+
+=head2 raw_string
+
+not yet
+
+=head1 AUTHOR
+
+Kazuho Oku E<lt>kazuhooku gmail.comE<gt>
+
+Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF GMAIL COME<gt>
+
+The module is based on L<Mojo::Template> by Sebastian Riedel.
+
+=head1 LICENSE
+
+This program is free software, you can redistribute it and/or modify it under the same terms as Perl 5.10.
+
+=cut
