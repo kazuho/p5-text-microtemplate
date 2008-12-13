@@ -235,7 +235,8 @@ sub parse {
                 # Multiline expressions are a bit complicated,
                 # only the first line can be compiled as 'expr'
                 $state = 'code' if $multiline_expression;
-                $multiline_expression = 1 if $state eq 'expr';
+                $multiline_expression = 1
+                    if $state eq 'expr' || $state eq 'raw_expr';
 
                 # Store value
                 push @token, $state, $token;
