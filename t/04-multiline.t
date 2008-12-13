@@ -26,18 +26,24 @@ abc <?=r 1
 };
 
 # automatic semicolon insertion
-is eval as_html(<<'...'), "1\n-1\n", 'expr auto-sci';
+is eval as_html(<<'...'), "abc\n1\n-1\ndef\n", 'expr auto-sci';
+abc
 ?= 1
 ?= -1
+def
 ...
-is eval as_html(<<'...'), "1\n-1\n", 'expr auto-sci';
+is eval as_html(<<'...'), "abc\n1\n-1\ndef\n", 'expr auto-sci';
+abc
 ?=r 1
 ?=r -1
+def
 ...
 
 # no automatic semicolon insertion for code
-is eval as_html(<<'...'), "0\n", 'no auto-sci for code';
+is eval as_html(<<'...'), "abc\n0\ndef\n", 'no auto-sci for code';
+abc
 ? my $a = 1
 ? - 1
 ?= $a
+def
 ...
