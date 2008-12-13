@@ -360,48 +360,81 @@ Text::MicroTemplate
     use Text::MicroTemplate qw(as_html);
 
     # simple form
-    my $user = 'John';
-    my $html = eval as_html('hello, <?= $user ?>')
+    $user = 'John';
+    $html = eval as_html('hello, <?= $user ?>')
         or die $@;
 
     # complex form
-    my $mt = Text::MicroTemplate->new(
+    $mt = Text::MicroTemplate->new(
         template => 'hello, <?= $query->param('user') ?>,
     );
-    my $code = $mt->code;
-    my $builder = eval << "..." or die $@;
+    $code = $mt->code;
+    $builder = eval << "..." or die $@;
     sub {
         my \$query = shift;
         $code->();
     }
     ...
-    $builder->(CGI->new);
+    $html = $builder->(CGI->new);
 
 =head1 DESCRIPTION
 
 Text::MicroTemplate is a fast, standalone, intelligent template engine based on Mojo::Template.
 
-=head1 SYNTAX
+=head1 TEMPLATE SYNTAX
 
-not yet
+    # output the result of expression with automatic escape
+    <?= $expr ?>             (tag style)
+    ?= $expr                 (per-line)
+
+    # output the result expression without escape (tag style)
+    <?=r $raw_str ?>
+    ?=r $raw_str
+
+    # execute perl code (tag style)
+    <? foo() ?>
+    ? foo()
+
+    # comment (tag style)
+    <?# comment ?>
+    ?# comment
+
+    # loops
+    <ul>
+    ? for my $item (@list) {
+    <li><?= $item ?></li>
+    ? }
+    </ul>
 
 =head1 METHODS
 
-=head2 as_html
+=head2 as_html($template)
 
-not yet
+Utility funtion that returns an expression that renders given template when evaluated.
 
-=head2 new
+    # outputs: hello, John!
+    $user = 'John';
+    $html = eval as_html('hello, <?= $user ?>!') or die $@;
 
-not yet
+=head2 new(%args)
 
-=head2 code
+Constructor.  Accepts following arguments.
 
-not yet
+=head3 template
 
-=head2 raw_string
+template
 
-not yet
+=head3 escape_func
+
+name of function used to escape variables.  If set to undef, no escape occurs.
+
+=head2 code()
+
+Returns perl code that renders the template when evaluated.
+
+=head2 raw_string($str)
+
+Wraps given string to an object that will not be escaped by the template engine.
 
 =head1 AUTHOR
 

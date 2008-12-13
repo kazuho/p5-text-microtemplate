@@ -1,0 +1,25 @@
+This is Perl module Text::MicroTemplate.
+
+INSTALLATION
+
+Text::MicroTemplate installation is straightforward. If your CPAN shell is
+set up, you should just be able to do
+
+    % cpan Text::MicroTemplate
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Text::MicroTemplate documentation is available as in POD. So you can do:
+
+    % perldoc Text::MicroTemplate
+
+to read the documentation online with your favorite pager.
