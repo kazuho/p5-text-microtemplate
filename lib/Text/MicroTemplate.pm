@@ -39,6 +39,16 @@ sub new {
     $self;
 }
 
+sub escape_func {
+    my $self = shift;
+    if (@_) {
+        $self->{escape_func} = shift;
+    }
+    $self->{escape_func};
+}
+
+sub template { shift->{template} }
+
 sub code {
     my $self = shift;
     unless (defined $self->{code}) {
@@ -46,8 +56,6 @@ sub code {
     }
     $self->{code};
 }
-
-sub escape_func { shift->{escape_func} }
 
 sub build {
     my $self = shift;
@@ -406,7 +414,7 @@ Text::MicroTemplate is a fast, standalone, intelligent template engine based on 
     ? }
     </ul>
 
-=head1 METHODS
+=head1 EXPORTABLE FUNCTIONS
 
 =head2 as_html($template)
 
@@ -416,25 +424,27 @@ Utility funtion that returns an expression that renders given template when eval
     $user = 'John';
     $html = eval as_html('hello, <?= $user ?>!') or die $@;
 
-=head2 new(%args)
+=head2 raw_string($str)
 
-Constructor.  Accepts following arguments.
+wraps given string to an object that will not be escaped by the template engine
 
-=head3 template
+=head1 OO-STYLE INTERFACE
+
+Text::MicroTemplate provides OO-style interface to handle more complex cases.  The constructor accepts a hash (or a hasref) with following arguments.
+
+=head2 template
 
 template
 
-=head3 escape_func
+=head2 escape_func
 
-name of function used to escape variables.  If set to undef, no escape occurs.
+name of function used to escape variables.  If set to undef, no escape occurs. (default: html escape)
+
+=head1 OO-STYLE ACCESSORS
 
 =head2 code()
 
-Returns perl code that renders the template when evaluated.
-
-=head2 raw_string($str)
-
-Wraps given string to an object that will not be escaped by the template engine.
+returns perl code that renders the template when evaluated
 
 =head1 AUTHOR
 
