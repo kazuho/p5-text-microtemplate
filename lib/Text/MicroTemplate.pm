@@ -387,7 +387,23 @@ Text::MicroTemplate
 
 =head1 DESCRIPTION
 
-Text::MicroTemplate is a fast, standalone, intelligent template engine based on Mojo::Template.
+Text::MicroTemplate is a standalone, fast, intelligent, extensible template engine with following features.
+
+=head2 standalone
+
+Text::MicroTemplate does not rely on other CPAN modules.
+
+=head2 fast
+
+Based on C<Mojo::Template>, expressions in the template is perl code.
+
+=head2 intelligent
+
+Text::MicroTemplate automatically escapes variables when and only when necessary.
+
+=head2 extensible
+
+Text::MicroTemplate does not provide features like template cache or including other files by itself.  However, it is easy to add you own (that suites the most to your application), by wrapping the result of the module (which is a perl expression).
 
 =head1 TEMPLATE SYNTAX
 
