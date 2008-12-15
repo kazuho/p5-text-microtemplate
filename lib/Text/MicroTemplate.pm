@@ -324,7 +324,7 @@ sub _error {
         my $line   = $2 - $line_offset;
         my $delim  = '-' x 76;
         
-        my $report = "$reason at line $line of template$from.\n";
+        my $report = "$reason at line $line in template$from.\n";
         my $template = $self->_context($self->{template}, $line);
         $report .= "$delim\n$template$delim\n";
 
