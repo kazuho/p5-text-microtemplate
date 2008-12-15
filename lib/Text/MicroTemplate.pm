@@ -341,10 +341,9 @@ sub build_mt {
     my $_code = $_mt->code;
     my $expr = << "...";
 sub {
-    my \$args = \@_ == 1 ? \$_[0] : { \@_ };
     encoded_string((
         $_code
-    )->());
+    )->(\@_));
 }
 ...
     my $die_msg;
@@ -353,7 +352,7 @@ sub {
         if (my $_builder = eval($expr)) {
             return $_builder;
         }
-        $die_msg = $_mt->_error($@, 3);
+        $die_msg = $_mt->_error($@, 2);
     }
     die $die_msg;
 }
@@ -389,15 +388,12 @@ Text::MicroTemplate
 
     use Text::MicroTemplate qw(:all);
 
-    # simple form
-    $html = render_mt(
-         'hello, <?= $args->{user} ?>',
-         { user => 'John' },
-    )->as_string;
+    # compile template, and render
+    $renderer = build_mt('hello, <?= $_[0] ?>');
+    $html = $renderer->('John')->as_string;
 
-    # cache compiled template as subref
-    $renderer = build_mt('hello, <?= $args->{user} ?>');
-    $html = $renderer->({ user => 'John' })->as_string;
+    # or in one line
+    $html = render_mt('hello, <?= $_[0] ?>', 'John')->as_string;
 
     # complex form
     $mt = Text::MicroTemplate->new(
@@ -459,41 +455,35 @@ Text::MicroTemplate does not provide features like template cache or including o
 
 =head1 EXPORTABLE FUNCTIONS
 
-=head2 render_mt($template, $args)
-
-Utility function that renders given template and returns an EncodedString.
-
-    # render
-    $hello = render_mt(
-        'hello, <?= $args->{user} ?>!',
-        { user => 'John' },
-    );
-
-    # print as HTML
-    print $hello->as_string;
-
-    # use the result in another template (no double-escapes)
-    $enc = render_mt(
-        '<h1><?= $args->{hello} ?></h1>',
-        { hello => $hello },
-    );
-
-Intertally, the function is equivalent to:
-
-    build_mt($template)->($args);
-
 =head2 build_mt($template)
 
 Returns a subref that renders given template.  Parameters are equivalent to Text::MicroTemplate->new.
 
     # build template renderer at startup time and use it multiple times
-    my $renderer = build_mt('hello, <?= $args->{user} ?>!');
+    my $renderer = build_mt('hello, <?= $_[0] ?>!');
 
     sub run {
         ...
-        my $hello = $renderer->({ user => $query->param('user') });
+        my $hello = $renderer->($query->param('user'));
         ...
     }
+
+=head2 render_mt($template, $args)
+
+Utility function that combines build_mt and call to the generated template builder.
+
+    # render
+    $hello = render_mt('hello, <?= $_[0] ?>!', 'John');
+
+    # print as HTML
+    print $hello->as_string;
+
+    # use the result in another template (no double-escapes)
+    $enc = render_mt('<h1><?= $_[0] ?></h1>', $hello);
+
+Intertally, the function is equivalent to:
+
+    build_mt($template)->(@_);
 
 =head2 encoded_string($str)
 

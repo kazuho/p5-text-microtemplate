@@ -1,14 +1,10 @@
 use strict;
 use warnings;
-use Test::More tests => 4;
+use Test::More tests => 3;
 use Text::MicroTemplate qw(:all);
 
 is(
-    render_mt('hello <?= $args->{user} ?>', { user => 'fo<o' })->as_string,
-    'hello fo&lt;o',
-);
-is(
-    render_mt('hello <?= $args->{user} ?>', user => 'fo<o')->as_string,
+    render_mt('hello <?= $_[0] ?>', 'fo<o')->as_string,
     'hello fo&lt;o',
 );
 
@@ -20,5 +16,5 @@ do {
         $s = 1;
     };
     is $s, 0, 'die on access to nonexistent value';
-    like $@, qr/ at line 1 .*$0 at line 19/;
+    like $@, qr/ at line 1 .*$0 at line \d+/;
 };

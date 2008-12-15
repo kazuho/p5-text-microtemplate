@@ -8,7 +8,7 @@ do {
     my $y;
     is(render_mt(<<'...', sub { $y = 1 })->as_string, "abc 1 def\n", 'multiline expr');
 abc <?= 1
- $args->() ?> def
+ $_[0]->() ?> def
 ...
     ok $y;
 };
@@ -18,7 +18,7 @@ do {
     my $y;
     is render_mt(<<'...', sub { $y = 1 })->as_string, "abc 1 def\n", 'multiline rawexpr';
 abc <?=r 1
- $args->() ?> def
+ $_[0]->() ?> def
 ...
     ok $y;
 };

@@ -14,15 +14,15 @@ is render_mt('aaa<?# a ?>bbb')->as_string, "aaabbb";
 
 # expression and raw expression
 do {
-    is render_mt('<?= $args ?>', 'foo<a')->as_string, 'foo&lt;a';
-    is render_mt('<?=r $args ?>', 'foo<a')->as_string, 'foo<a';
+    is render_mt('<?= $_[0] ?>', 'foo<a')->as_string, 'foo&lt;a';
+    is render_mt('<?=r $_[0] ?>', 'foo<a')->as_string, 'foo<a';
     my $rs = encoded_string('foo<a');
-    is render_mt('<?= $args ?>', $rs)->as_string, 'foo<a';
-    is render_mt('<?=r $args ?>', $rs)->as_string, 'foo<a';
+    is render_mt('<?= $_[0] ?>', $rs)->as_string, 'foo<a';
+    is render_mt('<?=r $_[0] ?>', $rs)->as_string, 'foo<a';
 };
 do {
     use utf8;
-    is render_mt('あ<?= $args ?>う', 'い<')->as_string, 'あい&lt;う';
+    is render_mt('あ<?= $_[0] ?>う', 'い<')->as_string, 'あい&lt;う';
     my $rs = encoded_string('い<');
-    is render_mt('あ<?= $args ?>う', $rs)->as_string, 'あい<う';
+    is render_mt('あ<?= $_[0] ?>う', $rs)->as_string, 'あい<う';
 }
