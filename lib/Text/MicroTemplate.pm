@@ -13,7 +13,7 @@ use Carp 'croak';
 
 our $VERSION = '0.01';
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(as_html raw_string);
+our @EXPORT_OK = qw(as_html encoded_string);
 our %EXPORT_TAGS = (
     all => [ @EXPORT_OK ],
 );
@@ -100,13 +100,13 @@ sub build {
 
             # Expression
             if ($type eq 'expr') {
-                $lines[-1] .= "\$_MT_T = scalar $value; \$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::RawString' ? \$\$_MT_T : $escape_func(\$_MT_T);";
+                $lines[-1] .= "\$_MT_T = scalar $value; \$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escape_func(\$_MT_T);";
             }
 
             # Raw Expression
             if ($type eq 'raw_expr') {
                 
-                $lines[-1] .= "\$_MT_T = $value; \$_MT .= ref \$_MT_T eq q(Text::MicroTemplate::RawString) ? \$\$_MT_T : \$_MT_T;";
+                $lines[-1] .= "\$_MT_T = $value; \$_MT .= ref \$_MT_T eq q(Text::MicroTemplate::EncodedString) ? \$\$_MT_T : \$_MT_T;";
             }
         }
     }
@@ -332,15 +332,14 @@ sub _error {
 }
 
 # create raw string (that does not need to be escaped)
-sub raw_string {
-    my $s = shift;
-    bless \$s, 'Text::MicroTemplate::RawString';
+sub encoded_string {
+    Text::MicroTemplate::EncodedString->new(shift);
 }
 
 sub escape_html {
     my $str = shift;
-    return $$str
-        if ref $str eq 'Text::MicroTemplate::RawString';
+    return $str->as_string
+        if ref $str eq 'Text::MicroTemplate::EncodedString';
     $str =~ s/&/&amp;/g;
     $str =~ s/>/&gt;/g;
     $str =~ s/</&lt;/g;
@@ -354,6 +353,21 @@ sub as_html {
     my $mt = Text::MicroTemplate->new;
     $mt->parse($t);
     '((' . $mt->code . ')->())';
+}
+
+package Text::MicroTemplate::EncodedString;
+
+use strict;
+use warnings;
+
+sub new {
+    my ($klass, $str) = @_;
+    bless \$str, $klass;
+}
+
+sub as_string {
+    my $self = shift;
+    $$self;
 }
 
 1;
@@ -440,7 +454,7 @@ Utility funtion that returns an expression that renders given template when eval
     $user = 'John';
     $html = eval as_html('hello, <?= $user ?>!') or die $@;
 
-=head2 raw_string($str)
+=head2 encoded_string($str)
 
 wraps given string to an object that will not be escaped by the template engine
 
