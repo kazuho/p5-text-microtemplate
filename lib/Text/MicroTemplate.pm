@@ -271,34 +271,11 @@ sub parse {
 
 sub _context {
     my ($self, $text, $line) = @_;
-
-    $line     -= 1;
-    my $nline  = $line + 1;
-    my $pline  = $line - 1;
-    my $nnline = $line + 2;
-    my $ppline = $line - 2;
     my @lines  = split /\n/, $text;
-
-    # Context
-    my $context = (($line + 1) . ': ' . $lines[$line] . "\n");
-
-    # -1
-    $context = (($pline + 1) . ': ' . $lines[$pline] . "\n" . $context)
-        if $pline >= 0 && $lines[$pline];
-
-    # -2
-    $context = (($ppline + 1) . ': ' . $lines[$ppline] . "\n" . $context)
-        if $ppline >= 0 && $lines[$ppline];
-
-    # +1
-    $context = ($context . ($nline + 1) . ': ' . $lines[$nline] . "\n")
-        if $lines[$nline];
-
-    # +2
-    $context = ($context . ($nnline + 1) . ': ' . $lines[$nnline] . "\n")
-        if $lines[$nnline];
-
-    return $context;
+    
+    join '', map {
+        0 < $_ && $_ <= @lines ? sprintf("%-4x: %s\n", $_, $lines[$_ - 1]) : ''
+    } ($line - 2) .. ($line + 2);
 }
 
 # Debug goodness
