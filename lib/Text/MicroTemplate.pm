@@ -274,7 +274,7 @@ sub _context {
     my @lines  = split /\n/, $text;
     
     join '', map {
-        0 < $_ && $_ <= @lines ? sprintf("%-4x: %s\n", $_, $lines[$_ - 1]) : ''
+        0 < $_ && $_ <= @lines ? sprintf("%4d: %s\n", $_, $lines[$_ - 1]) : ''
     } ($line - 2) .. ($line + 2);
 }
 
