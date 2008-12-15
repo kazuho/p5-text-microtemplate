@@ -284,46 +284,54 @@ sub _context {
 
     # -1
     $context = (($pline + 1) . ': ' . $lines[$pline] . "\n" . $context)
-      if $lines[$pline];
+        if $pline >= 0 && $lines[$pline];
 
     # -2
     $context = (($ppline + 1) . ': ' . $lines[$ppline] . "\n" . $context)
-      if $lines[$ppline];
+        if $ppline >= 0 && $lines[$ppline];
 
     # +1
     $context = ($context . ($nline + 1) . ': ' . $lines[$nline] . "\n")
-      if $lines[$nline];
+        if $lines[$nline];
 
     # +2
     $context = ($context . ($nnline + 1) . ': ' . $lines[$nnline] . "\n")
-      if $lines[$nnline];
+        if $lines[$nnline];
 
     return $context;
 }
 
 # Debug goodness
 sub _error {
-    my ($self, $error) = @_;
-
-    # No trace in production mode
-    return undef unless DEBUG;
+    my ($self, $error, $line_offset) = @_;
 
     # Line
-    if ($error =~ /at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
-        my $line  = $1;
-        my $delim = '-' x 76;
-
-        my $report = "\nTemplate error around line $line.\n";
+    if ($error =~ /^(.*)\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
+        my $reason = $1;
+        my $line   = $2 - $line_offset;
+        my $delim  = '-' x 76;
+        
+        my $from = sub {
+            my $i = 1;
+            while (my @c = caller($i++)) {
+                if ($c[0] ne __PACKAGE__) {
+                    return " passed from $c[1] at line $c[2]";
+                }
+            }
+            '';
+        }->();
+        
+        my $report = "$reason at line $line of template$from.\n";
         my $template = $self->_context($self->{template}, $line);
         $report .= "$delim\n$template$delim\n";
 
         # Advanced debugging
-        if (DEBUG >= 2) {
+        if (DEBUG) {
             my $code = $self->_context($self->code, $line);
             $report .= "$code$delim\n";
         }
 
-        $report .= "$error\n";
+        $report .= $error;
         return $report;
     }
 
@@ -333,7 +341,7 @@ sub _error {
 
 # create raw string (that does not need to be escaped)
 sub encoded_string {
-    Text::MicroTemplate::EncodedString->new(shift);
+    Text::MicroTemplate::EncodedString->new($_[0]);
 }
 
 sub escape_html {
@@ -348,11 +356,33 @@ sub escape_html {
     return $str;
 }
 
+sub mt_build {
+    my $_mt = Text::MicroTemplate->new(
+        ref($_[0]) ? $_[0] : { template => shift },
+    );
+    my $_code = $_mt->code;
+    my $expr = << "...";
+sub {
+    my \$args = \@_ == 1 ? \$_[0] : { \@_ };
+    encoded_string((
+        $_code
+    )->());
+}
+...
+    my $die_msg;
+    {
+        local $@;
+        if (my $_builder = eval($expr)) {
+            return $_builder;
+        }
+        $die_msg = $_mt->_error($@, 3);
+    }
+    die $die_msg;
+}
+
 sub as_html {
-    my $t = shift;
-    my $mt = Text::MicroTemplate->new;
-    $mt->parse($t);
-    '((' . $mt->code . ')->())';
+    my $builder = mt_build(shift);
+    $builder->(@_);
 }
 
 package Text::MicroTemplate::EncodedString;
