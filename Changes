@@ -1,4 +1,9 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.02
+	- add render_mt and build_mt, remove as_html
+	- more tests and docs
+	- better error message
+
 0.01
 	- initial release
