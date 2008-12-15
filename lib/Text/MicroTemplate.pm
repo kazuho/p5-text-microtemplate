@@ -303,23 +303,26 @@ sub _context {
 
 # Debug goodness
 sub _error {
-    my ($self, $error, $line_offset) = @_;
-
+    my ($self, $error, $line_offset, $from) = @_;
+    
+    unless (defined $from) {
+        $from = sub {
+            my $i = 1;
+            while (my @c = caller($i++)) {
+                if ($c[0] ne __PACKAGE__) {
+                    return "$c[1] at line $c[2]";
+                }
+            }
+            '';
+        }->();
+    }
+    $from = ' passed from ' . $from;
+    
     # Line
     if ($error =~ /^(.*)\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
         my $reason = $1;
         my $line   = $2 - $line_offset;
         my $delim  = '-' x 76;
-        
-        my $from = sub {
-            my $i = 1;
-            while (my @c = caller($i++)) {
-                if ($c[0] ne __PACKAGE__) {
-                    return " passed from $c[1] at line $c[2]";
-                }
-            }
-            '';
-        }->();
         
         my $report = "$reason at line $line of template$from.\n";
         my $template = $self->_context($self->{template}, $line);
