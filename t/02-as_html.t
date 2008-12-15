@@ -21,4 +21,5 @@ do {
     };
     is $s, 0, 'die on access to nonexistent value';
     like $@, qr/ at line 1 .*$0 at line 19/;
+    print $@;
 };
