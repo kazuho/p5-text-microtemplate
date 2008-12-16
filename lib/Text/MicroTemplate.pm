@@ -11,7 +11,7 @@ use constant DEBUG => $ENV{MICRO_TEMPLATE_DEBUG} || 0;
 
 use Carp 'croak';
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(encoded_string build_mt render_mt);
 our %EXPORT_TAGS = (
@@ -515,7 +515,7 @@ Text::MicroTemplate provides OO-style interface to handle more complex cases.
 
 =head2 new(\%args)
 
-Constructs a HTML template renderer.  In the second or third form, parameters below are recognized.
+Constructs template renderer.  In the second or third form, parameters below are recognized.
 
 =head3 template
 
