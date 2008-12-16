@@ -73,3 +73,64 @@ sub render_file {
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Text::MicroTemplate::File - a file-based template manager
+
+=head1 SYNOPSIS
+
+    use Text::MicroTemplate::File;
+
+    our $mtf = Text::MicroTemplate->new(
+        include_path => [ $path1, $path2, ... ],
+        use_cache    => 1,
+    );
+
+    # render
+    $mtf->render_file('template.file', $arg1, $arg2, ...);
+
+=head1 DESCRIPTION
+
+Text::MicroTemplate::File is a file-based template manager for L<Text::MicroTemplate>.
+
+=head1 PROPERTIES
+
+Text::MicroTemplate provides OO-style interface with following properties.
+
+=head2 cache
+
+cache mode (0: no cache (default), 1: cache with update check, 2: cache but do not check updates)
+
+=head2 open_layer
+
+layer passed to L<open> (default: ":utf8")
+
+=head2 package_name
+
+package under where template files are compiled (deafult: "main")
+
+=head1 METHODS
+
+=head2 build_file($file)
+
+Returns a subref that renders given template file.
+
+=head2 render_file($file, @args)
+
+Renders the template file with given arguments.
+
+=head1 SEE ALSO
+
+L<Text::MicroTemplate>
+
+=head1 AUTHOR
+
+Kazuho Oku E<lt>kazuhooku gmail.comE<gt>
+
+=head1 LICENSE
+
+This program is free software, you can redistribute it and/or modify it under the same terms as Perl 5.10.
+
+=cut
