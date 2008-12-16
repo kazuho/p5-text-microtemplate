@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.03
+	- parameters passed using @_
+	- friendly warning messages
+	- package name can be set when building renderers
+
 0.02
 	- add render_mt and build_mt, remove as_html
 	- more tests and docs
