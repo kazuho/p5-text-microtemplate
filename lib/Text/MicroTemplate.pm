@@ -31,10 +31,21 @@ sub new {
         tag_start           => '<?',
         tag_end             => '?>',
         escape_func         => 'Text::MicroTemplate::escape_html',
+        package_name        => undef, # defaults to caller
         @_ == 1 ? ref($_[0]) ? %{$_[0]} : (template => $_[0]) : @_,
     }, $class;
     if (defined $self->{template}) {
         $self->parse($self->{template});
+    }
+    unless (defined $self->{package_name}) {
+        $self->{package_name} = 'main';
+        my $i = 0;
+        while (my $c = caller(++$i)) {
+            if ($c ne __PACKAGE__) {
+                $self->{package_name} = $c;
+                last;
+            }
+        }
     }
     $self;
 }
@@ -45,6 +56,14 @@ sub escape_func {
         $self->{escape_func} = shift;
     }
     $self->{escape_func};
+}
+
+sub package_name {
+    my $self = shift;
+    if (@_) {
+        $self->{package_name} = shift;
+    }
+    $self->{package_name};
 }
 
 sub template { shift->{template} }
@@ -265,7 +284,7 @@ sub parse {
         }
         push @{$self->{tree}}, \@token;
     }
-
+    
     return $self;
 }
 
@@ -282,26 +301,13 @@ sub _context {
 sub _error {
     my ($self, $error, $line_offset, $from) = @_;
     
-    unless (defined $from) {
-        $from = sub {
-            my $i = 1;
-            while (my @c = caller($i++)) {
-                if ($c[0] ne __PACKAGE__) {
-                    return "$c[1] at line $c[2]";
-                }
-            }
-            '';
-        }->();
-    }
-    $from = ' passed from ' . $from;
-    
     # Line
     if ($error =~ /^(.*)\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
         my $reason = $1;
         my $line   = $2 - $line_offset;
         my $delim  = '-' x 76;
         
-        my $report = "$reason at line $line in template$from.\n";
+        my $report = "$reason at line $line in template passed from $from.\n";
         my $template = $self->_context($self->{template}, $line);
         $report .= "$delim\n$template$delim\n";
 
@@ -339,10 +345,19 @@ sub escape_html {
 sub build_mt {
     my $_mt = Text::MicroTemplate->new(@_);
     my $_code = $_mt->code;
+    my $_from = sub {
+        my $i = 0;
+        while (my @c = caller(++$i)) {
+            return "$c[1] at line $c[2]"
+                if $c[0] ne __PACKAGE__;
+        }
+        '';
+    }->();
     my $expr = << "...";
+package $_mt->{package_name};
 sub {
-    local \$SIG{__WARN__} = sub { print STDERR \$_mt->_error(shift, 3) };
-    encoded_string((
+    local \$SIG{__WARN__} = sub { print STDERR \$_mt->_error(shift, 4, \$_from) };
+    Text::MicroTemplate::encoded_string((
         $_code
     )->(\@_));
 }
@@ -353,7 +368,7 @@ sub {
         if (my $_builder = eval($expr)) {
             return $_builder;
         }
-        $die_msg = $_mt->_error($@, 3);
+        $die_msg = $_mt->_error($@, 4, $_from);
     }
     die $die_msg;
 }
@@ -496,9 +511,23 @@ Text::MicroTemplate provides OO-style interface to handle more complex cases.
 
 =head2 new($template)
 
-=head2 new({ template => $template, escape_func => 'escape_funcname' })
+=head2 new(%args)
 
-In the first form, constructs a HTML template renderer.  In the second form, constructs a renderer that would escape non-encoded strings using given escape function.  If escape function is set to undef, no escape will occur.  The default escape function is C<Text::MicroTemplate::escape_html>.
+=head2 new(\%args)
+
+Constructs a HTML template renderer.  In the second or third form, parameters below are recognized.
+
+=head3 template
+
+template string (mandatory)
+
+=head3 escape_func
+
+escape function (defaults to C<Text::MicroTemplate::escape_html), no escape when set to undef
+
+=head3 package_name
+
+package under where the renderer is compiled (defaults to caller package)
 
 =head2 code()
 
