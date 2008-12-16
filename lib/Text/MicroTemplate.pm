@@ -523,7 +523,7 @@ template string (mandatory)
 
 =head3 escape_func
 
-escape function (defaults to C<Text::MicroTemplate::escape_html), no escape when set to undef
+escape function (defaults to C<Text::MicroTemplate::escape_html>), no escape when set to undef
 
 =head3 package_name
 
