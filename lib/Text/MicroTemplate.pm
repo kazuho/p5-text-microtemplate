@@ -41,7 +41,7 @@ sub new {
         $self->{package_name} = 'main';
         my $i = 0;
         while (my $c = caller(++$i)) {
-            if ($c ne __PACKAGE__) {
+            if ($c !~ /^Text::MicroTemplate($|::)/) {
                 $self->{package_name} = $c;
                 last;
             }
@@ -71,12 +71,12 @@ sub template { shift->{template} }
 sub code {
     my $self = shift;
     unless (defined $self->{code}) {
-        $self->build();
+        $self->_build();
     }
     $self->{code};
 }
 
-sub build {
+sub _build {
     my $self = shift;
     
     my $escape_func = $self->{escape_func} || '';
@@ -151,6 +151,7 @@ sub parse {
 
     # Clean start
     delete $self->{tree};
+    delete $self->{code};
 
     # Tags
     my $line_start    = quotemeta $self->{line_start};
@@ -343,7 +344,12 @@ sub escape_html {
 }
 
 sub build_mt {
-    my $_mt = Text::MicroTemplate->new(@_);
+    my $mt = Text::MicroTemplate->new(@_);
+    $mt->build();
+}
+
+sub build {
+    my $_mt = shift;
     my $_code = $_mt->code;
     my $_from = sub {
         my $i = 0;
