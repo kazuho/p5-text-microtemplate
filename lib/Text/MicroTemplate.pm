@@ -11,7 +11,7 @@ use constant DEBUG => $ENV{MICRO_TEMPLATE_DEBUG} || 0;
 
 use Carp 'croak';
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(encoded_string build_mt render_mt);
 our %EXPORT_TAGS = (
