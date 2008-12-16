@@ -309,9 +309,9 @@ sub _error {
         if (DEBUG) {
             my $code = $self->_context($self->code, $line);
             $report .= "$code$delim\n";
+            $report .= $error;
         }
 
-        $report .= $error;
         return $report;
     }
 
@@ -341,6 +341,7 @@ sub build_mt {
     my $_code = $_mt->code;
     my $expr = << "...";
 sub {
+    local \$SIG{__WARN__} = sub { print STDERR \$_mt->_error(shift, 3) };
     encoded_string((
         $_code
     )->(\@_));
@@ -352,7 +353,7 @@ sub {
         if (my $_builder = eval($expr)) {
             return $_builder;
         }
-        $die_msg = $_mt->_error($@, 2);
+        $die_msg = $_mt->_error($@, 3);
     }
     die $die_msg;
 }
