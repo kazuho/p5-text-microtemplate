@@ -76,8 +76,10 @@ sub wrapper_file {
     my $self = shift;
     my $file = shift;
     my @args = @_;
-    no strict 'refs';
-    my $mtref = ${"$self->{package_name}::_MTREF"};
+    my $mtref = do {
+        no strict 'refs';
+        ${"$self->{package_name}::_MTREF"};
+    };
     my $before = $$mtref;
     $$mtref = '';
     return sub {
