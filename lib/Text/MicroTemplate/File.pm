@@ -86,7 +86,7 @@ sub wrapper_file {
         my $inner_func = shift;
         $inner_func->(@_);
         $$mtref =
-            $before . $self->render_file($file, $$mtref, @args)->as_string;
+            $before . $self->render_file($file, Text::MicroTemplate::encoded_string($$mtref), @args)->as_string;
     }
 }
 
