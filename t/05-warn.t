@@ -1,8 +1,17 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use Test::More;
+
+BEGIN {
+    eval { require IO::Scalar };
+    if ($@) {
+        plan( skip_all => "IO::Scalar is not installed" );
+    } else {
+        plan( tests => 2);
+    }
+}
+
 use Text::MicroTemplate qw(:all);
-use IO::Scalar;
 
 my $w;
 tie *STDERR, 'IO::Scalar', \$w;
