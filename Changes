@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.05
+	- add wrapper_file and filter functions
+
 0.04
 	- add Text::MicroTemplate::File
 
