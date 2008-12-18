@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 14;
+use Test::More tests => 15;
 use File::Temp qw(tempdir);
 
 BEGIN {
@@ -17,6 +17,7 @@ do {
     is $mtf->render_file('package.mt')->as_string, "main\n", 'default package';
     is $mtf->render_file('wrapped.mt')->as_string, "abc\nheader\ndef\n\nfooter\nghi\n", 'wrapper';
     is $mtf->render_file('wrapped2.mt')->as_string, "abc\nheader\ndef\nheader\nghi\n\nfooter\njkl\n\nfooter\nmno\n", 'wrapper';
+    is $mtf->render_file('wrapped_escape.mt')->as_string, "abc\nheader\n<def>\n\nfooter\nghi\n", 'wrapper';
 };
 
 # package name
