@@ -333,6 +333,8 @@ sub encoded_string {
 
 sub escape_html {
     my $str = shift;
+    return ''
+        unless defined $str;
     return $str->as_string
         if ref $str eq 'Text::MicroTemplate::EncodedString';
     $str =~ s/&/&amp;/g;
