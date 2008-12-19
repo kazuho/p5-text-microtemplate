@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 6;
 use Text::MicroTemplate qw(:all);
 
 # comment
@@ -15,10 +15,8 @@ is render_mt('aaa<?# a ?>bbb')->as_string, "aaabbb";
 # expression and raw expression
 do {
     is render_mt('<?= $_[0] ?>', 'foo<a')->as_string, 'foo&lt;a';
-    is render_mt('<?=r $_[0] ?>', 'foo<a')->as_string, 'foo<a';
     my $rs = encoded_string('foo<a');
     is render_mt('<?= $_[0] ?>', $rs)->as_string, 'foo<a';
-    is render_mt('<?=r $_[0] ?>', $rs)->as_string, 'foo<a';
 };
 do {
     use utf8;

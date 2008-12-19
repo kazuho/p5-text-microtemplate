@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 7;
+use Test::More tests => 4;
 use Text::MicroTemplate qw(:all);
 
 # expr (expected behaviour from code)
@@ -13,27 +13,11 @@ abc <?= 1
     ok $y;
 };
 
-# raw expr (expected behaviour from code)
-do {
-    my $y;
-    is render_mt(<<'...', sub { $y = 1 })->as_string, "abc 1 def\n", 'multiline rawexpr';
-abc <?=r 1
- $_[0]->() ?> def
-...
-    ok $y;
-};
-
 # automatic semicolon insertion
 is render_mt(<<'...')->as_string, "abc\n1\n-1\ndef\n", 'expr auto-sci';
 abc
 ?= 1
 ?= -1
-def
-...
-is render_mt(<<'...')->as_string, "abc\n1\n-1\ndef\n", 'expr auto-sci';
-abc
-?=r 1
-?=r -1
 def
 ...
 
