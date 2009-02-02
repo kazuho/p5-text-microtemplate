@@ -101,7 +101,7 @@ Text::MicroTemplate::File - a file-based template manager
 
     use Text::MicroTemplate::File;
 
-    our $mtf = Text::MicroTemplate->new(
+    our $mtf = Text::MicroTemplate::File->new(
         include_path => [ $path1, $path2, ... ],
         use_cache    => 1,
     );
