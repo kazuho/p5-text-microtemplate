@@ -127,7 +127,7 @@ layer passed to L<open> (default: ":utf8")
 
 =head2 package_name
 
-package under where template files are compiled (deafult: "main")
+package under where template files are compiled (default: "main")
 
 =head1 METHODS
 
