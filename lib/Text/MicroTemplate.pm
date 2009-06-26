@@ -210,14 +210,17 @@ sub parse {
 
         # Mixed line
         my @token;
-        my $rule = join '|', sort {length($b) <=> length($a)} (
-            "$tag_start$raw_expr_mark", # Raw Expression
-            "$tag_start$expr_mark",     # Expression
-            "$tag_start$cmnt_mark",     # Comment
-            $tag_start,                 # Code
-            $tag_end,                   # End
-        );
-        for my $token (split /($rule)/, $line) {
+        for my $token (split /
+            (
+                $tag_start$expr_mark     # Expression
+            |
+                $tag_start$cmnt_mark     # Comment
+            |
+                $tag_start               # Code
+            |
+                $tag_end                 # End
+            )
+        /x, $line) {
 
             # Garbage
             next unless $token;
