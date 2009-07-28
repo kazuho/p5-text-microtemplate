@@ -8,6 +8,7 @@ require Exporter;
 use strict;
 use warnings;
 use constant DEBUG => $ENV{MICRO_TEMPLATE_DEBUG} || 0;
+use 5.00800;
 
 use Carp 'croak';
 
