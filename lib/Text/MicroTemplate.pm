@@ -12,7 +12,7 @@ use 5.00800;
 
 use Carp 'croak';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(encoded_string build_mt render_mt);
 our %EXPORT_TAGS = (
