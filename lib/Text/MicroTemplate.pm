@@ -11,13 +11,15 @@ use constant DEBUG => $ENV{MICRO_TEMPLATE_DEBUG} || 0;
 use 5.00800;
 
 use Carp 'croak';
+use Scalar::Util;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(encoded_string build_mt render_mt);
 our %EXPORT_TAGS = (
     all => [ @EXPORT_OK ],
 );
+our $_mt_setter = '';
 
 sub new {
     my $class = shift;
@@ -307,18 +309,17 @@ sub encoded_string {
     Text::MicroTemplate::EncodedString->new($_[0]);
 }
 
-sub escape_html {
-    my $str = shift;
-    return ''
-        unless defined $str;
-    return $str->as_string
-        if ref $str eq 'Text::MicroTemplate::EncodedString';
-    $str =~ s/&/&amp;/g;
-    $str =~ s/>/&gt;/g;
-    $str =~ s/</&lt;/g;
-    $str =~ s/"/&quot;/g;
-    $str =~ s/'/&#39;/g;
-    return $str;
+{
+    my %_escape_table = ( '&' => '&amp;', '>' => '&gt;', '<' => '&lt;', q{"} => '&quot;', q{'} => '&#39' );
+    sub escape_html {
+        my $str = shift;
+        return ''
+            unless defined $str;
+        return $str->as_string
+            if ref $str eq 'Text::MicroTemplate::EncodedString';
+        $str =~ s/([&><"'])/$_escape_table{$1}/ge;
+        return $str;
+    }
 }
 
 sub build_mt {
@@ -328,6 +329,7 @@ sub build_mt {
 
 sub build {
     my $_mt = shift;
+    Scalar::Util::weaken($_mt) if $_mt_setter;
     my $_code = $_mt->code;
     my $_from = sub {
         my $i = 0;
@@ -340,7 +342,7 @@ sub build {
     my $expr = << "...";
 package $_mt->{package_name};
 sub {
-    local \$SIG{__WARN__} = sub { print STDERR \$_mt->_error(shift, 4, \$_from) };
+    ${_mt_setter}local \$SIG{__WARN__} = sub { print STDERR \$_mt->_error(shift, 4, \$_from) };
     Text::MicroTemplate::encoded_string((
         $_code
     )->(\@_));
@@ -392,6 +394,8 @@ package Text::MicroTemplate::EncodedString;
 
 use strict;
 use warnings;
+
+use overload q{""} => sub { shift->as_string }, fallback => 1;
 
 sub new {
     my ($klass, $str) = @_;

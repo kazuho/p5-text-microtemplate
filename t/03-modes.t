@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 8;
 use Text::MicroTemplate qw(:all);
 
 # comment
@@ -17,6 +17,10 @@ do {
     is render_mt('<?= $_[0] ?>', 'foo<a')->as_string, 'foo&lt;a';
     my $rs = encoded_string('foo<a');
     is render_mt('<?= $_[0] ?>', $rs)->as_string, 'foo<a';
+
+    # overload
+    is $rs, 'foo<a';
+    is render_mt('<?= $_[0] ?>', $rs), 'foo<a';
 };
 do {
     use utf8;

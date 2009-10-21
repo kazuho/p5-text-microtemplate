@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 19;
 use File::Temp qw(tempdir);
 
 BEGIN {
@@ -56,4 +56,28 @@ do {
     unlink "$dir/t.mt"
         or die "failed to remove $dir/t.mt:$!";
     is $mtf->render_file('t.mt')->as_string, '2', 'cache=2 read after cached';
+};
+
+# open_layer (default=:utf8)
+do {
+    use utf8;
+    my $mtf = Text::MicroTemplate::File->new(
+        include_path => 't/07-file',
+    );
+
+    my $output = $mtf->render_file('konnitiwa.mt', '世界')->as_string;
+    is $output, 'こんにちは、世界', 'utf8 flagged render ok';
+    ok utf8::is_utf8($output), 'utf8 flagged output ok';
+};
+
+do {
+    no utf8;
+    my $mtf = Text::MicroTemplate::File->new(
+        include_path => 't/07-file',
+        open_layer   => '',
+    );
+
+    my $output = $mtf->render_file('konnitiwa.mt', '世界')->as_string;
+    is $output, 'こんにちは、世界', 'utf8 bytes render ok';
+    ok !utf8::is_utf8($output), 'utf8 bytes output ok';
 };
