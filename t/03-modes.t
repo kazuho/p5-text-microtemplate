@@ -1,15 +1,7 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More tests => 8;
 use Text::MicroTemplate qw(:all);
-
-# escape_html
-
-is(Text::MicroTemplate::escape_html('&') => '&amp;');
-is(Text::MicroTemplate::escape_html('>') => '&gt;');
-is(Text::MicroTemplate::escape_html('<') => '&lt;');
-is(Text::MicroTemplate::escape_html('"') => '&quot;');
-is(Text::MicroTemplate::escape_html("'") => '&#39;');
 
 # comment
 is render_mt(<<'...')->as_string, "aaa\nbbb\n";
