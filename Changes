@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.09
+	- bugfix: ' was encoded to &#39 (semicolon missing)
+
 0.08
 	- Fixed Text::MicroTemplate::File memory leaks (thanks to miyagawa-san)
 
