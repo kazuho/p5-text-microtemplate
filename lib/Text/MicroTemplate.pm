@@ -365,6 +365,11 @@ sub {
     )->(\@_));
 }
 ...
+
+    if(DEBUG >= 2){
+        DEBUG >= 3 ? die $expr : warn $expr;
+    }
+
     my $die_msg;
     {
         local $@;
