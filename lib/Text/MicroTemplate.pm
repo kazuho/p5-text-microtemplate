@@ -324,7 +324,7 @@ sub _inline_escape_html{
             $variable;
         }
     }; #" for poor editors
-    $source =~ s/\n//g;
+    $source =~ s/\n//g; # to keep line numbers
     return $source;
 }
 
