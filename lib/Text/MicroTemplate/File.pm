@@ -51,23 +51,25 @@ sub build_file {
         if (my @st = stat $filepath) {
             if (my $e = $self->{cache}->{$file}) {
                 return $e->[1]
-                    if $st[9] == $e->[0];
+                    if $st[9] == $e->[0]; # compare mtime
             }
+
             open my $fh, "<$self->{open_layer}", $filepath
                 or croak "failed to open:$filepath:$!";
             my $src = do { local $/; join '', <$fh> };
             close $fh;
+
             $self->parse($src);
             local $Text::MicroTemplate::_mt_setter = 'my $_mt = shift;';
             my $f = $self->build();
             $self->{cache}->{$file} = [
-                $st[9],
+                $st[9], # mtime
                 $f,
             ] if $self->{use_cache};
             return $f;
         }
     }
-    die "could not find template file: $file\n";
+    croak "could not find template file: $file (include_path: @{$self->{include_path}})";
 }
 
 sub render_file {
