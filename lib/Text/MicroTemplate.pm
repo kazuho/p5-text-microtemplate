@@ -43,7 +43,7 @@ sub new {
         $self->{package_name} = 'main';
         my $i = 0;
         while (my $c = caller(++$i)) {
-            if ($c !~ /^Text::MicroTemplate($|::)/) {
+            if ($c !~ /^Text::MicroTemplate\b/) {
                 $self->{package_name} = $c;
                 last;
             }
@@ -126,7 +126,7 @@ sub _build {
             # Expression
             if ($type eq 'expr') {
                 my $escaped = $embed_escape_func->('$_MT_T');
-                $lines[-1] .= "\$_MT_T = scalar $value;\$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escaped;";
+                $lines[-1] .= "\$_MT_T = $value;\$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escaped;";
             }
         }
     }
@@ -137,7 +137,6 @@ sub _build {
     }
     
     # Wrap
-    $lines[0] ||= '';
     $lines[0]   = q/sub { my $_MT = ''; local $/ . $self->{package_name} . q/::_MTREF = \$_MT; my $_MT_T = '';/ . $lines[0];
     $lines[-1] .= q/return $_MT; }/;
 
