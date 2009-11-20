@@ -53,10 +53,11 @@ sub build_file {
                 return $e->[1]
                     if $st[9] == $e->[0]; # compare mtime
             }
+            local $/;
 
             open my $fh, "<$self->{open_layer}", $filepath
                 or croak "failed to open:$filepath:$!";
-            my $src = do { local $/; join '', <$fh> };
+            my $src = <$fh>;
             close $fh;
 
             $self->parse($src);
