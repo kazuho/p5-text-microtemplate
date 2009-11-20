@@ -1,0 +1,12 @@
+<html>
+<head><title>Programming languages</title></head>
+<body>
+<h1><TMPL_VAR NAME=page_title ESCAPE=HTML></h1>
+<br />
+<ul>
+<TMPL_LOOP NAME=languages>
+<li><TMPL_IF NAME=ll>*</TMPL_IF><TMPL_VAR NAME=language ESCAPE=HTML></li>
+</TMPL_LOOP>
+</ul>
+</body>
+</html>
