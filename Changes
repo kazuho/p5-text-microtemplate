@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.10
+	- optimization (thanks to gfx, cached mode is now faster than HT::Pro !)
+
 0.09
 	- bugfix: ' was encoded to &#39 (semicolon missing)
 
