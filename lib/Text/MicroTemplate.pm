@@ -566,11 +566,11 @@ package under where the renderer is compiled (defaults to caller package)
 
 returns perl code that renders the template when evaluated
 
-=head2 filter(sub filter_func { ... })->sub({ template lines })
+=head2 filter(sub filter_func { ... })->(sub { template lines })
 
 filters given template lines
 
-    ? $_mt->filter(sub { s/Hello/Good bye/g })->sub({
+    ? $_mt->filter(sub { s/Hello/Good bye/g })->(sub {
     Hello, John!
     ? })
 
