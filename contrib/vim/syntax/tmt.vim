@@ -2,12 +2,10 @@
 " Language: tmt
 " Maintainer: Kan Fushihara
 " Installation:
-" To automatilcally load this file when a .rhtml file is opened, add the
-" following lines to ~/.vim/filetype.vim:
+" To automatilcally load this file when a .mt file is opened, add the
+" following lines to ~/.vim/ftdetect/mt.vim
 "
-" augroup filetypedetect
-" au! BufRead,BufNewFile *.tmt setfiletype tmt
-" augroup END
+" autocmd! BufReadPost *.mt setfiletype tmt
 "
 " You will have to restart vim for this to take effect. In any case it
 " is a good idea to read ":he new-filetype" so that you know what is going
