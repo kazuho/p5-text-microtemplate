@@ -23,4 +23,6 @@ exec "runtime! syntax/html.vim"
 unlet! b:current_syntax
  
 exec "runtime! syntax/tmt.vim"
-
+syntax region  xmlProcessing matchgroup=xmlProcessingDelim start="<?xml" end="?>" contains=xmlAttrib,xmlEqual,xmlString
+highlight def link xmlProcessing Comment
+highlight def link xmlProcessingDelim Comment
