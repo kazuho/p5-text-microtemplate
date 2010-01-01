@@ -70,7 +70,11 @@ do {
     ok utf8::is_utf8($output), 'utf8 flagged output ok';
 };
 
-do {
+SKIP: {
+    skip "Perl < 5.8.3 has bug around join.see perl583delta.pod", 2 if $] < 5.008003;
+    # perl583delta.pod says
+    # > join() could return garbage when the same join() statement was used to process 8 bit data having earlier processed UTF8 data, due to the flags on that statement's temporary workspace not being reset correctly. This is now fixed.
+    # We hope, this is not critical issue in real world.
     no utf8;
     my $mtf = Text::MicroTemplate::File->new(
         include_path => 't/07-file',
