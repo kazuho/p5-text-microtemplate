@@ -4,6 +4,7 @@
 ^Makefile$
 ~$
 \.old$
+\.orig$
 ^blib/
 ^pm_to_blib
 ^MakeMaker-\d

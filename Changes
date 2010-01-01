@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.11
+	- add vim syntax files (by kan & walf443)
+	- fix example in POD (by tokuhirom)
+	- skip some tests on perl < 5.8.3 (by tokuhirom)
+
 0.10
 	- optimization (thanks to gfx, cached mode is now faster than HT::Pro !)
 
