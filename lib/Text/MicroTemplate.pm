@@ -448,7 +448,7 @@ Text::MicroTemplate
 
     # complex form
     $mt = Text::MicroTemplate->new(
-        template => 'hello, <?= $query->param('user') ?>,
+        template => 'hello, <?= $query->param('user') ?>',
     );
     $code = $mt->code;
     $renderer = eval << "..." or die $@;
