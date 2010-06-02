@@ -133,7 +133,7 @@ sub _build {
 
     # add semicolon to last line of code
     if ($last_was_code) {
-        $lines[-1] .= ';';
+        $lines[-1] .= "\n;";
     }
     
     # Wrap
