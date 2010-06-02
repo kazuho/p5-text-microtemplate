@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.13
+	- suppress syntax error when last expression within an entire template includes a comment (by typester)
+
 0.12
 	- the last token in a template line was dropped if it was "false" when evaluated in boolean context
 	- suppress warning on render_mt("") (by typester)
