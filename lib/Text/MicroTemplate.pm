@@ -230,7 +230,7 @@ sub parse {
         /x, $line) {
 
             # Garbage
-            next unless $token;
+            next if $token eq '';
 
             # End
             if ($token =~ /^$tag_end$/) {
