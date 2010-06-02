@@ -11,4 +11,6 @@ $SIG{__WARN__} = sub {
 is render_mt('')->as_string, '', 'empty template ok';
 is $warn, q[], 'no warnings occurred ok';
 
-
+$warn = '';
+is render_mt('0')->as_string, '0', '"0" template ok';
+is $warn, q[], 'no warnings occurred ok';
