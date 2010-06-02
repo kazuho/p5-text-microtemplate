@@ -137,7 +137,7 @@ sub _build {
     }
     
     # Wrap
-    $lines[0]   = q/sub { my $_MT = ''; local $/ . $self->{package_name} . q/::_MTREF = \$_MT; my $_MT_T = '';/ . ($lines[0] || '');
+    $lines[0]   = q/sub { my $_MT = ''; local $/ . $self->{package_name} . q/::_MTREF = \$_MT; my $_MT_T = '';/ . (@lines ? $lines[0] : '');
     $lines[-1] .= q/return $_MT; }/;
 
     $self->{code} = join "\n", @lines;
