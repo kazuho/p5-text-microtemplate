@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.14
+	- optimization (concatenate multi-line string constants at compile time)
+
 0.13
 	- suppress syntax error when last expression within an entire template includes a comment (by typester)
 
