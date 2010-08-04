@@ -90,6 +90,7 @@ sub _build {
     # Compile
     my @lines;
     my $last_was_code;
+    my $last_text;
     for my $line (@{$self->{tree}}) {
 
         # New line
@@ -98,6 +99,11 @@ sub _build {
             my $type  = $line->[$j];
             my $value = $line->[$j + 1];
 
+            if ($type ne 'text' && defined $last_text) {
+                $lines[-1] = "\$_MT .=\"$last_text\";";
+                undef $last_text;
+            }
+            
             # Need to fix line ending?
             my $newline = chomp $value;
 
@@ -114,7 +120,7 @@ sub _build {
                 $value = quotemeta($value);
                 $value .= '\n' if $newline;
 
-                $lines[-1] .= "\$_MT .= \"" . $value . "\";";
+                $last_text = defined $last_text ? "$last_text$value" : $value;
             }
 
             # Code
@@ -134,6 +140,10 @@ sub _build {
     # add semicolon to last line of code
     if ($last_was_code) {
         $lines[-1] .= "\n;";
+    }
+    # add last text line(s)
+    if (defined $last_text) {
+        $lines[-1] .= "\$_MT .=\"$last_text\";";
     }
     
     # Wrap
