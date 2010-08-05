@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.15
+	- [bugfix] fix degradation in the optimazition introduced in 0.14 that caused compound lines within template to be miscompiled
+
 0.14
 	- optimization (concatenate multi-line string constants at compile time)
 
