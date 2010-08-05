@@ -90,7 +90,7 @@ sub _build {
     # Compile
     my @lines;
     my $last_was_code;
-    my $cached_text;
+    my $last_text;
     for my $line (@{$self->{tree}}) {
 
         # New line
@@ -99,9 +99,9 @@ sub _build {
             my $type  = $line->[$j];
             my $value = $line->[$j + 1];
 
-            if ($type ne 'text' && defined $cached_text) {
-                $lines[-1] = "\$_MT .=\"$cached_text\";";
-                undef $cached_text;
+            if ($type ne 'text' && defined $last_text) {
+                $lines[-1] .= "\$_MT .=\"$last_text\";";
+                undef $last_text;
             }
             
             # Need to fix line ending?
@@ -120,12 +120,7 @@ sub _build {
                 $value = quotemeta($value);
                 $value .= '\n' if $newline;
 
-                if ($lines[-1] eq '') {
-                    $cached_text =
-                        defined $cached_text ? "$cached_text$value" : $value;
-                } else {
-                    $lines[-1] .= "\$_MT.=\"$value\";";
-                }
+                $last_text = defined $last_text ? "$last_text$value" : $value;
             }
 
             # Code
@@ -147,8 +142,8 @@ sub _build {
         $lines[-1] .= "\n;";
     }
     # add last text line(s)
-    if (defined $cached_text) {
-        $lines[-1] .= "\$_MT .=\"$cached_text\";";
+    if (defined $last_text) {
+        $lines[-1] .= "\$_MT .=\"$last_text\";";
     }
     
     # Wrap
