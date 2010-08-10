@@ -45,32 +45,42 @@ sub build_file {
             return $e->[1];
         }
     }
-    # iterate
-    foreach my $path (@{$self->{include_path}}) {
-        my $filepath = $path . '/' . $file;
-        if (my @st = stat $filepath) {
-            if (my $e = $self->{cache}->{$file}) {
-                return $e->[1]
-                    if $st[9] == $e->[0]; # compare mtime
-            }
-            local $/;
-
-            open my $fh, "<$self->{open_layer}", $filepath
-                or croak "failed to open:$filepath:$!";
-            my $src = <$fh>;
-            close $fh;
-
-            $self->parse($src);
-            local $Text::MicroTemplate::_mt_setter = 'my $_mt = shift;';
-            my $f = $self->build();
-            $self->{cache}->{$file} = [
-                $st[9], # mtime
-                $f,
-            ] if $self->{use_cache};
-            return $f;
+    # setup ($filepath, @st)
+    my ($filepath, @st);
+    if ($file =~ m|^/|) {
+        # absolute path
+        $filepath = $file;
+        @st = stat $filepath;
+    } else {
+        # relative path, search "include_path"s
+        foreach my $path (@{$self->{include_path}}) {
+            $filepath = $path . '/' . $file;
+            @st = stat $filepath
+                and last;
         }
     }
-    croak "could not find template file: $file (include_path: @{$self->{include_path}})";
+    croak "could not find template file: $file (include_path: @{$self->{include_path}})"
+        unless @st;
+    
+    # return cached entry after comparing mtime
+    if (my $e = $self->{cache}->{$file}) {
+        return $e->[1]
+            if $st[9] == $e->[0]; # compare mtime
+    }
+
+    # read the file, parse, build, cache the entry if necessary, and return
+    open my $fh, "<$self->{open_layer}", $filepath
+        or croak "failed to open:$filepath:$!";
+    my $src = do { local $/; <$fh> };
+    close $fh;
+    $self->parse($src);
+    local $Text::MicroTemplate::_mt_setter = 'my $_mt = shift;';
+    my $f = $self->build();
+    $self->{cache}->{$file} = [
+        $st[9], # mtime
+        $f,
+    ] if $self->{use_cache};
+    return $f;
 }
 
 sub render_file {
