@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 21;
 use Cwd qw(abs_path);
 use File::Temp qw(tempdir);
 
