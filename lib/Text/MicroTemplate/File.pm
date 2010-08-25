@@ -134,7 +134,7 @@ Text::MicroTemplate::File is a file-based template manager for L<Text::MicroTemp
 
 Text::MicroTemplate provides OO-style interface with following properties.
 
-=head2 cache
+=head2 use_cache
 
 cache mode (0: no cache (default), 1: cache with update check, 2: cache but do not check updates)
 
