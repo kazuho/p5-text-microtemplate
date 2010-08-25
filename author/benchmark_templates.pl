@@ -3,21 +3,25 @@
 use strict;
 use warnings;
 use HTML::Template;
-use HTML::Template::Compiled speed => 1;
 use HTML::Template::Pro;
 use Template;
 use Text::MicroTemplate::File;
 use Config;
 use FindBin '$Bin';
 
-use Benchmark qw(timethese cmpthese);
-
-printf "Perl/%vd (%s)\n", $^V, $Config{archname};
-foreach my $module(qw(
+my @modules = qw(
     HTML::Template HTML::Template::Compiled HTML::Template::Pro
     Template
     Text::MicroTemplate
-)){
+);
+
+my $has_htc = eval "use HTML::Template::Compiled speed => 1; 1;";
+push @modules, 'HTML::Template::Compiled' if $has_htc;
+
+use Benchmark qw(timethese cmpthese);
+
+printf "Perl/%vd (%s)\n", $^V, $Config{archname};
+foreach my $module (@modules){
     print "$module/", $module->VERSION, "\n";
 }
 
@@ -143,7 +147,7 @@ cmpthese timethese -1, {
     'MT'      => \&mt,
     'HT'      => \&ht,
     'HT::Pro' => \&htp,
-    'HT::C'   => \&htc,
+    $has_htc ? ('HT::C'   => \&htc) : (),
     'TT'      => \&tt,
 };
 
