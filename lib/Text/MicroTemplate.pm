@@ -447,7 +447,7 @@ __END__
 
 =head1 NAME
 
-Text::MicroTemplate
+Text::MicroTemplate - Micro template engine with Perl5 language
 
 =head1 SYNOPSIS
 
@@ -496,6 +496,8 @@ Text::MicroTemplate does not provide features like template cache or including o
 The module only provides basic building blocks for a template engine.  Refer to L<Text::MicroTemplate::File> for higher-level interface.
 
 =head1 TEMPLATE SYNTAX
+
+The template language is Perl5 itself!
 
     # output the result of expression with automatic escape
     <?= $expr ?>             (tag style)
@@ -588,9 +590,17 @@ filters given template lines
     Hello, John!
     ? })
 
+=head1 DEBUG
+
+The C<MICRO_TEMPLATE_DEBUG> environment variable helps debugging.
+The value C<1> extends debugging messages, C<2> reports compiled
+Perl code with C<warn()>, C<3> is like C<2> but uses C<die()>.
+
 =head1 SEE ALSO
 
 L<Text::MicroTemplate::File>
+
+L<Text::MicroTemplate::Extended>
 
 =head1 AUTHOR
 
@@ -602,6 +612,6 @@ The module is based on L<Mojo::Template> by Sebastian Riedel.
 
 =head1 LICENSE
 
-This program is free software, you can redistribute it and/or modify it under the same terms as Perl 5.10.
+This program is free software, you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
