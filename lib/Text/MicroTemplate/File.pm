@@ -8,6 +8,11 @@ use Carp qw(croak);
 
 our @ISA = qw(Text::MicroTemplate);
 
+BEGIN {
+    my $taint_mode = ${^TAINT};
+    sub _TAINT_MODE { $taint_mode }
+}
+
 sub new {
     my $klass = shift;
     my $self = $klass->SUPER::new(@_);
@@ -73,6 +78,17 @@ sub build_file {
         or croak "failed to open:$filepath:$!";
     my $src = do { local $/; <$fh> };
     close $fh;
+    if(_TAINT_MODE) {
+        my $mode = (stat $filepath)[2]; # file mode
+        if($mode & 022) { # writable for non-owners
+            croak("Insecure dependency in ",
+                ref($self), ": '$filepath' is writable for others");
+        }
+        # CLEAR TAINTNESS WITHOUT ANY SANITIZE
+        $src =~ /\A (.*) \z/xms;
+        $src = $1;
+    }
+
     $self->parse($src);
     local $Text::MicroTemplate::_mt_setter = 'my $_mt = shift;';
     my $f = $self->build();
