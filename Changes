@@ -1,5 +1,10 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.16
+	- treat filenames starting with "/" as absolute paths
+	- support lines like "? =pod"
+	- fix documentation issues
+
 0.15
 	- [bugfix] fix degradation in the optimazition introduced in 0.14 that caused compound lines within template to be miscompiled
 
