@@ -2,6 +2,7 @@ package Text::MicroTemplate::File;
 
 use strict;
 use warnings;
+use File::Spec;
 use Text::MicroTemplate;
 
 use Carp qw(croak);
@@ -47,7 +48,7 @@ sub build_file {
     }
     # setup ($filepath, @st)
     my ($filepath, @st);
-    if ($file =~ m|^/|) {
+    if (File::Spec->file_name_is_absolute($file)) {
         # absolute path
         $filepath = $file;
         @st = stat $filepath;
