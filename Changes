@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.17
+	- detects absolute paths using File::Spec->file_name_is_absolute (win32 compatibility fix)
+
 0.16
 	- treat filenames starting with "/" as absolute paths
 	- support lines like "? =pod"
