@@ -7,6 +7,4 @@ license 'perl';
 
 test_requires 'File::Temp';
 test_requires 'Test::More';
-use_test_base;
-auto_include;
 WriteAll;
