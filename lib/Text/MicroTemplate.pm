@@ -12,6 +12,7 @@ use 5.00800;
 
 use Carp 'croak';
 use Scalar::Util;
+use HTML::Escape;
 
 our $VERSION = '0.17';
 our @ISA = qw(Exporter);
@@ -32,7 +33,7 @@ sub new {
         tree                => [],
         tag_start           => '<?',
         tag_end             => '?>',
-        escape_func         => \&_inline_escape_html,
+        escape_func         => 'DEFAULT',
         package_name        => undef, # defaults to caller
         @_ == 1 ? ref($_[0]) ? %{$_[0]} : (template => $_[0]) : @_,
     }, $class;
@@ -83,9 +84,13 @@ sub _build {
     
     my $escape_func = $self->{escape_func} || '';
 
-    my $embed_escape_func = ref($escape_func) eq 'CODE'
-        ? $escape_func
-        : sub{ $escape_func . "(@_)" };
+    my $html_concat;
+    if($escape_func eq 'DEFAULT') {
+        $html_concat = 'HTML::Escape::html_concat(%s, %s)';
+    }
+    else { # a fully qualified function name
+        $html_concat = "%s .= $escape_func(%s)";
+    }
 
     # Compile
     my @lines;
@@ -135,8 +140,7 @@ sub _build {
 
             # Expression
             if ($type eq 'expr') {
-                my $escaped = $embed_escape_func->('$_MT_T');
-                $lines[-1] .= "\$_MT_T = $value;\$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escaped;";
+                $lines[-1] .=  sprintf($html_concat, '$_MT', $value) . ";\n";
             }
         }
     }
@@ -323,33 +327,11 @@ sub _error {
 }
 
 # create raw string (that does not need to be escaped)
-sub encoded_string {
-    Text::MicroTemplate::EncodedString->new($_[0]);
-}
+sub encoded_string; *encoded_string = \&HTML::Escape::mark_raw;
 
-
-sub _inline_escape_html{
-    my($variable) = @_;
-
-    my $source = qq{
-        do{
-            $variable =~ s/([&><"'])/\$Text::MicroTemplate::_escape_table{\$1}/ge;
-            $variable;
-        }
-    }; #" for poor editors
-    $source =~ s/\n//g; # to keep line numbers
-    return $source;
-}
-
-our %_escape_table = ( '&' => '&amp;', '>' => '&gt;', '<' => '&lt;', q{"} => '&quot;', q{'} => '&#39;' );
 sub escape_html {
-    my $str = shift;
-    return ''
-        unless defined $str;
-    return $str->as_string
-        if ref $str eq 'Text::MicroTemplate::EncodedString';
-    $str =~ s/([&><"'])/$_escape_table{$1}/ge; #' for poor editors
-    return $str;
+    my $raw = HTML::Escape::html_escape(@_);
+    return defined($raw) ? '' : $raw->as_string();
 }
 
 sub build_mt {
@@ -425,22 +407,8 @@ sub filter {
     }
 }
 
-package Text::MicroTemplate::EncodedString;
-
-use strict;
-use warnings;
-
-use overload q{""} => sub { shift->as_string }, fallback => 1;
-
-sub new {
-    my ($klass, $str) = @_;
-    bless \$str, $klass;
-}
-
-sub as_string {
-    my $self = shift;
-    $$self;
-}
+# for Text::MicroTemplate::EncodedString->new()
+sub EncodedString() { 'HTML::Escape::RawString' }
 
 1;
 __END__

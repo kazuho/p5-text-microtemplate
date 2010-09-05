@@ -11,5 +11,5 @@ is html('&'), '&amp;';
 is html('>'), '&gt;';
 is html('<'), '&lt;';
 is html(q{"}), '&quot;';
-is html(q{'}), '&#39;';
+is html(q{'}), '&apos;';
 
