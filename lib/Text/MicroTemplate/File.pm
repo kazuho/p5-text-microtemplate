@@ -24,6 +24,12 @@ sub new {
     $self;
 }
 
+sub include_path {
+    my $self = shift;
+    croak "This is readonly accessor" if @_;
+    $self->{include_path};
+}
+
 sub open_layer {
     my $self = shift;
     $self->{open_layer} = $_[0]
@@ -134,6 +140,12 @@ Text::MicroTemplate::File is a file-based template manager for L<Text::MicroTemp
 =head1 PROPERTIES
 
 Text::MicroTemplate provides OO-style interface with following properties.
+
+=head2 include_path
+
+include path (default: ['.'])
+
+This accessor is readonly.
 
 =head2 use_cache
 
