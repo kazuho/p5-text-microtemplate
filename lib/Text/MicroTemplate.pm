@@ -33,6 +33,7 @@ sub new {
         tag_start           => '<?',
         tag_end             => '?>',
         escape_func         => \&_inline_escape_html,
+        prepend             => undef,
         package_name        => undef, # defaults to caller
         @_ == 1 ? ref($_[0]) ? %{$_[0]} : (template => $_[0]) : @_,
     }, $class;
@@ -373,6 +374,7 @@ sub build {
 package $_mt->{package_name};
 sub {
     ${_mt_setter}local \$SIG{__WARN__} = sub { print STDERR \$_mt->_error(shift, 4, \$_from) };
+    $_mt->{prepend}
     Text::MicroTemplate::encoded_string((
         $_code
     )->(\@_));
