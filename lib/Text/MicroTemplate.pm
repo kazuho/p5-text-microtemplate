@@ -580,6 +580,10 @@ escape function (defaults to L<Text::MicroTemplate::escape_html>), no escape whe
 
 package under where the renderer is compiled (defaults to caller package)
 
+=head3 prepend
+
+Prepends Perl code to the template.
+
 =head2 code()
 
 returns perl code that renders the template when evaluated
