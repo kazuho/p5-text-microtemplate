@@ -27,6 +27,7 @@ sub new {
         code                => undef,
         comment_mark        => '#',
         expression_mark     => '=',
+        raw_expression_mark => '=!',
         line_start          => '?',
         template            => undef,
         tree                => [],
@@ -138,6 +139,11 @@ sub _build {
                 my $escaped = $embed_escape_func->('$_MT_T');
                 $lines[-1] .= "\$_MT_T = $value;\$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escaped;";
             }
+
+            # Raw Expression
+            if ($type eq 'raw_expr') {
+                $lines[-1] .= "\$_MT .= $value;";
+            }
         }
     }
 
@@ -173,6 +179,7 @@ sub parse {
     my $tag_end       = quotemeta $self->{tag_end};
     my $cmnt_mark     = quotemeta $self->{comment_mark};
     my $expr_mark     = quotemeta $self->{expression_mark};
+    my $raw_expr_mark = quotemeta $self->{raw_expression_mark};
 
     # Tokenize
     my $state = 'text';
@@ -194,9 +201,10 @@ sub parse {
         }
 
         # Perl line with return value
-        if ($line =~ /^$line_start$expr_mark\s+(.+)$/) {
+        if ($line =~ /^$line_start($raw_expr_mark|$expr_mark)\s+(.+)$/) {
+            my $state = $1 eq $self->{expression_mark} ? 'expr' : 'raw_expr';
             push @{$self->{tree}}, [
-                'expr', $1,
+                $state, $2,
                 $newline ? ('text', "\n") : (),
             ];
             $multiline_expression = 0;
@@ -233,6 +241,8 @@ sub parse {
         my @token;
         for my $token (split /
             (
+                $tag_start$raw_expr_mark # Raw Expression
+            |
                 $tag_start$expr_mark     # Expression
             |
                 $tag_start$cmnt_mark     # Comment
@@ -261,6 +271,11 @@ sub parse {
             # Expression
             elsif ($token =~ /^$tag_start$expr_mark$/) {
                 $state = 'expr';
+            }
+
+            # Raw
+            elsif ($token =~ /^$tag_start$raw_expr_mark$/) {
+                $state = 'raw_expr';
             }
 
             # Value
