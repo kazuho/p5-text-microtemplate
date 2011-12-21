@@ -27,7 +27,7 @@ sub new {
         code                => undef,
         comment_mark        => '#',
         expression_mark     => '=',
-        raw_expression_mark => '=!',
+        raw_expression_mark => '-',
         line_start          => '?',
         template            => undef,
         tree                => [],

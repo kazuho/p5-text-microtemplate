@@ -4,7 +4,7 @@ use Test::More tests => 5;
 use Text::MicroTemplate qw(:all);
 
 sub html {
-    render_mt('<?=! $_[0] ?>', @_)->as_string
+    render_mt('<?- $_[0] ?>', @_)->as_string
 }
 
 is html('&'), '&';
