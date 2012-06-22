@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 25;
+use Test::More tests => 26;
 use Cwd qw(abs_path);
 use File::Temp qw(tempdir);
 
@@ -18,6 +18,7 @@ do {
     is $mtf->render_file('package.mt')->as_string, "main\n", 'default package';
     is $mtf->render_file('wrapped.mt')->as_string, "abc\nheader\ndef\n\nfooter\nghi\n", 'wrapper';
     is $mtf->render_file('wrapped2.mt')->as_string, "abc\nheader\ndef\nheader\nghi\n\nfooter\njkl\n\nfooter\nmno\n", 'wrapper';
+    is $mtf->render_file('wrapped3.mt')->as_string, "abc\nheader\n\ndef\n\nfooter\nghi\n", 'wrapper';
     is $mtf->render_file('wrapped_escape.mt')->as_string, "abc\nheader\n<def>\n\nfooter\nghi\n", 'wrapper';
     is $mtf->render_file('pod.mt')->as_string, "0\n", 'pod';
 };
