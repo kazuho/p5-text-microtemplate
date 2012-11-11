@@ -136,7 +136,7 @@ sub _build {
             # Expression
             if ($type eq 'expr') {
                 my $escaped = $embed_escape_func->('$_MT_T');
-                $lines[-1] .= "\$_MT_T = $value;\$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escaped;";
+                $lines[-1] .= "\$_MT_T = $value;\$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escaped; \$_MT_T = '';";
             }
         }
     }
