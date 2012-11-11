@@ -13,7 +13,7 @@ use 5.00800;
 use Carp 'croak';
 use Scalar::Util;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(encoded_string build_mt render_mt);
 our %EXPORT_TAGS = (
