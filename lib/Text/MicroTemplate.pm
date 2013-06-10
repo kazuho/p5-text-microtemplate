@@ -204,7 +204,7 @@ sub parse {
         }
 
         # Comment line, dummy token needed for line count
-        if ($line =~ /^$line_start$cmnt_mark\s+$/) {
+        if ($line =~ /^$line_start$cmnt_mark/) {
             push @{$self->{tree}}, [];
             $multiline_expression = 0;
             next;
