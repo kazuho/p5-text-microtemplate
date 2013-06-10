@@ -1,12 +1,24 @@
 use strict;
 use warnings;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use Text::MicroTemplate qw(:all);
 
 # comment
 is render_mt(<<'...')->as_string, "aaa\nbbb\n";
 aaa
 ?# 
+bbb
+?# 
+...
+is render_mt(<<'...')->as_string, "aaa\nbbb\n";
+aaa
+?##############################################
+?#
+?# h2. comment title
+?#
+?# comment body
+?#
+?##############################################
 bbb
 ?# 
 ...
