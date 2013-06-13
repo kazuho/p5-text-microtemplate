@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.20
+	- [bugfix] '?# comment' was not working (by bokutin)
+
 0.19
 	- fix unexpected behavior (though is not a bug, see https://github.com/kazuho/p5-text-microtemplate/pull/6)
 
