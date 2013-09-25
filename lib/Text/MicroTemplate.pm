@@ -546,7 +546,7 @@ Utility function that combines build_mt and call to the generated template build
     # use the result in another template (no double-escapes)
     $enc = render_mt('<h1><?= $_[0] ?></h1>', $hello);
 
-Intertally, the function is equivalent to:
+Internally, the function is equivalent to:
 
     build_mt($template)->(@_);
 
