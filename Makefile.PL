@@ -7,4 +7,7 @@ license 'perl';
 
 test_requires 'File::Temp';
 test_requires 'Test::More';
+
+repository 'https://github.com/kazuho/p5-text-microtemplate';
+
 WriteAll;
