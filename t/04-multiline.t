@@ -6,9 +6,10 @@ use Text::MicroTemplate qw(:all);
 # expr (expected behaviour from code)
 do {
     my $y;
-    is(render_mt(<<'...', sub { $y = 1 })->as_string, "abc 1 def\n", 'multiline expr');
-abc <?= 1
- $_[0]->() ?> def
+    is(render_mt(<<'...', sub { $y = 1 })->as_string, "abc 0,1,2 def\n", 'multiline expr');
+abc <?= join ",", 0,
+$_[0]->(),
+2 ?> def
 ...
     ok $y;
 };
