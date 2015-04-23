@@ -186,28 +186,28 @@ sub parse {
             $newline = 1;
         }
         
-        # Perl line without return value
-        if ($line =~ /^$line_start\s+(.*)$/) {
-            push @{$self->{tree}}, ['code', $1];
-            $multiline_expression = 0;
-            next;
-        }
-
-        # Perl line with return value
-        if ($line =~ /^$line_start$expr_mark\s+(.+)$/) {
-            push @{$self->{tree}}, [
-                'expr', $1,
-                $newline ? ('text', "\n") : (),
-            ];
-            $multiline_expression = 0;
-            next;
-        }
-
-        # Comment line, dummy token needed for line count
-        if ($line =~ /^$line_start$cmnt_mark/) {
-            push @{$self->{tree}}, [];
-            $multiline_expression = 0;
-            next;
+        if ($state eq 'text') {
+            # Perl line without return value
+            if ($line =~ /^$line_start\s+(.*)$/) {
+                push @{$self->{tree}}, ['code', $1];
+                $multiline_expression = 0;
+                next;
+            }
+            # Perl line with return value
+            if ($line =~ /^$line_start$expr_mark\s+(.+)$/) {
+                push @{$self->{tree}}, [
+                    'expr', $1,
+                    $newline ? ('text', "\n") : (),
+                ];
+                $multiline_expression = 0;
+                next;
+            }
+            # Comment line, dummy token needed for line count
+            if ($line =~ /^$line_start$cmnt_mark/) {
+                push @{$self->{tree}}, [];
+                $multiline_expression = 0;
+                next;
+            }
         }
 
         # Escaped line ending?
