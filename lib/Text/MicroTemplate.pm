@@ -176,7 +176,7 @@ sub parse {
 
     # Tokenize
     my $state = 'text';
-    my $multiline_expression = 0;
+    my $push_expr = undef;
     my @lines = split /(\n)/, $tmpl;
     while (@lines) {
         my $line = shift @lines;
@@ -190,7 +190,6 @@ sub parse {
             # Perl line without return value
             if ($line =~ /^$line_start\s+(.*)$/) {
                 push @{$self->{tree}}, ['code', $1];
-                $multiline_expression = 0;
                 next;
             }
             # Perl line with return value
@@ -199,13 +198,11 @@ sub parse {
                     'expr', $1,
                     $newline ? ('text', "\n") : (),
                 ];
-                $multiline_expression = 0;
                 next;
             }
             # Comment line, dummy token needed for line count
             if ($line =~ /^$line_start$cmnt_mark/) {
                 push @{$self->{tree}}, [];
-                $multiline_expression = 0;
                 next;
             }
         }
@@ -249,7 +246,7 @@ sub parse {
             # End
             if ($token =~ /^$tag_end$/) {
                 $state = 'text';
-                $multiline_expression = 0;
+                $push_expr = undef;
             }
 
             # Code
@@ -269,11 +266,18 @@ sub parse {
                 # Comments are ignored
                 next if $state eq 'cmnt';
 
-                # Multiline expressions are a bit complicated,
-                # only the first line can be compiled as 'expr'
-                $state = 'code' if $multiline_expression;
-                $multiline_expression = 1
-                    if $state eq 'expr';
+                if ($push_expr) {
+                    $push_expr->($token);
+                    next;
+                }
+
+                $state = 'code' if $push_expr;
+                if ($state eq 'expr') {
+                    my $token = \@token;
+                    $push_expr = sub {
+                        $token->[-1] .= $_[0];
+                    };
+                }
 
                 # Store value
                 push @token, $state, $token;
