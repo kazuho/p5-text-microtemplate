@@ -136,6 +136,9 @@ sub _build {
             # Expression
             if ($type eq 'expr') {
                 my $escaped = $embed_escape_func->('$_MT_T');
+                if ($newline && $value =~ /\n/) {
+                    $value .= "\n"; # temporary workaround for t/13-heredoc.t
+                }
                 $lines[-1] .= "\$_MT_T = $value;\$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escaped; \$_MT_T = '';";
             }
         }
