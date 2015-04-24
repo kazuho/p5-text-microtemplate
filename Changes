@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.21
+	- fix the strange rule for multi-line expression #10
+
 0.20
 	- [bugfix] '?# comment' was not working (by bokutin)
 
