@@ -33,6 +33,7 @@ sub new {
         tag_start           => '<?',
         tag_end             => '?>',
         escape_func         => \&_inline_escape_html,
+        prepend             => '',
         package_name        => undef, # defaults to caller
         @_ == 1 ? ref($_[0]) ? %{$_[0]} : (template => $_[0]) : @_,
     }, $class;
@@ -364,10 +365,12 @@ sub build {
         }
         '';
     }->();
+    my $line_offset = (() = ($_mt->{prepend} =~ /\n/sg)) + 5;
     my $expr = << "...";
 package $_mt->{package_name};
 sub {
-    ${_mt_setter}local \$SIG{__WARN__} = sub { print STDERR \$_mt->_error(shift, 4, \$_from) };
+    ${_mt_setter}local \$SIG{__WARN__} = sub { print STDERR \$_mt->_error(shift, $line_offset, \$_from) };
+    $_mt->{prepend}
     Text::MicroTemplate::encoded_string((
         $_code
     )->(\@_));
@@ -384,7 +387,7 @@ sub {
         if (my $_builder = eval($expr)) {
             return $_builder;
         }
-        $die_msg = $_mt->_error($@, 4, $_from);
+        $die_msg = $_mt->_error($@, $line_offset, $_from);
     }
     die $die_msg;
 }
@@ -572,6 +575,10 @@ escape function (defaults to L<Text::MicroTemplate::escape_html>), no escape whe
 =head3 package_name
 
 package under where the renderer is compiled (defaults to caller package)
+
+=head3 prepend
+
+Prepends Perl code to the template.
 
 =head2 code()
 
