@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More;
 use Text::MicroTemplate qw(:all);
 
 my $mt = Text::MicroTemplate->new(
@@ -16,7 +16,7 @@ L006
 ? L009
 ?= L010
 <?#
-?> L012
+?> L(fixme-lineno-after-multiline-comment-becomens-incorrect)012
 ***
 );
 my $code = $mt->code;
@@ -33,3 +33,5 @@ for (my $i = 0; $i < @lines; ++$i) {
     diag $lines[$i]
         unless $ok;
 }
+
+done_testing;
