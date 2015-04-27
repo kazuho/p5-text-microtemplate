@@ -24,4 +24,4 @@ world
 ...
 };
 is $out, "hello\nworld\n", 'output on warn';
-like $w, qr/ at line \d+ .* $0 at line \d+/, 'warn location';
+like $w, qr/ at line 2 .* $0 at line \d+/, 'warn location';
