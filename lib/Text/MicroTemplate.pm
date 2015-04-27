@@ -33,7 +33,7 @@ sub new {
         tag_start           => '<?',
         tag_end             => '?>',
         escape_func         => \&_inline_escape_html,
-        prepend             => undef,
+        prepend             => '',
         package_name        => undef, # defaults to caller
         @_ == 1 ? ref($_[0]) ? %{$_[0]} : (template => $_[0]) : @_,
     }, $class;
