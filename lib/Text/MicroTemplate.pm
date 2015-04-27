@@ -179,8 +179,8 @@ sub parse {
 
     # Tokenize
     my $state = 'text';
-    my $push_expr = undef;
     my @lines = split /(\n)/, $tmpl;
+    my $tokens = [];
     while (@lines) {
         my $line = shift @lines;
         my $newline = undef;
@@ -213,24 +213,20 @@ sub parse {
         # Escaped line ending?
         if ($line =~ /(\\+)$/) {
             my $length = length $1;
-
             # Newline escaped
             if ($length == 1) {
                 $line =~ s/\\$//;
             }
-
             # Backslash escaped
             if ($length >= 2) {
                 $line =~ s/\\\\$/\\/;
                 $line .= "\n";
             }
+        } else {
+            $line .= "\n" if $newline;
         }
 
-        # Normal line ending
-        else { $line .= "\n" if $newline }
-
         # Mixed line
-        my @token;
         for my $token (split /
             (
                 $tag_start$expr_mark     # Expression
@@ -243,51 +239,43 @@ sub parse {
             )
         /x, $line) {
 
-            # Garbage
-            next if $token eq '';
-
-            # End
-            if ($token =~ /^$tag_end$/) {
+            # handle tags and bail out
+            if ($token eq '') {
+                next;
+            } elsif ($token =~ /^$tag_end$/) {
                 $state = 'text';
-                $push_expr = undef;
-            }
-
-            # Code
-            elsif ($token =~ /^$tag_start$/) { $state = 'code' }
-
-            # Comment
-            elsif ($token =~ /^$tag_start$cmnt_mark$/) { $state = 'cmnt' }
-
-            # Expression
-            elsif ($token =~ /^$tag_start$expr_mark$/) {
+                next;
+            } elsif ($token =~ /^$tag_start$/) {
+                $state = 'code';
+                next;
+            } elsif ($token =~ /^$tag_start$cmnt_mark$/) {
+                $state = 'cmnt';
+                next;
+            } elsif ($token =~ /^$tag_start$expr_mark$/) {
                 $state = 'expr';
+                next;
             }
 
-            # Value
-            else {
-
-                # Comments are ignored
-                next if $state eq 'cmnt';
-
-                if ($push_expr) {
-                    $push_expr->($token);
-                    next;
-                }
-
-                $state = 'code' if $push_expr;
-                if ($state eq 'expr') {
-                    my $token = \@token;
-                    $push_expr = sub {
-                        $token->[-1] .= $_[0];
-                    };
-                }
-
-                # Store value
-                push @token, $state, $token;
+            # value
+            if ($state eq 'text') {
+                push @$tokens, $state, $token;
+            } elsif ($state eq 'cmnt') {
+                next; # ignore comments
+            } elsif ($state eq 'cont') {
+                $tokens->[-1] .= $token;
+            } else {
+                # state is code or expr
+                push @$tokens, $state, $token;
+                $state = 'cont';
             }
         }
-        push @{$self->{tree}}, \@token;
+        if ($state eq 'text') {
+            push @{$self->{tree}}, $tokens;
+            $tokens = [];
+        }
     }
+    push @{$self->{tree}}, $tokens
+        if @$tokens;
     
     return $self;
 }
