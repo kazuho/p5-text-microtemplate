@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.23
+	- fix test error on Windows due to the use of unescaped paths in regex patterns (by nanis) #11 #13
+
 0.22
 	- fix regression in 0.21 (use of here-doc within `<?= ?>` causes syntax error) #12
 	- add support for `prepend` property for prepending code (by LoonyPandora) #3
