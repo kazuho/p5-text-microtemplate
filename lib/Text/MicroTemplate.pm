@@ -10,7 +10,6 @@ use warnings;
 use constant DEBUG => $ENV{MICRO_TEMPLATE_DEBUG} || 0;
 use 5.00800;
 
-use Carp 'croak';
 use Scalar::Util;
 
 our $VERSION = '0.23';

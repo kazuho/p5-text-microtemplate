@@ -5,7 +5,7 @@ use warnings;
 use File::Spec;
 use Text::MicroTemplate;
 
-use Carp qw(croak);
+sub croak {require Carp; goto &Carp::croak}
 
 our @ISA = qw(Text::MicroTemplate);
 
@@ -26,7 +26,7 @@ sub new {
 
 sub include_path {
     my $self = shift;
-    croak "This is readonly accessor" if @_;
+    croak("This is readonly accessor") if @_;
     $self->{include_path};
 }
 
@@ -66,9 +66,9 @@ sub build_file {
                 and last;
         }
     }
-    croak "could not find template file: $file (include_path: @{$self->{include_path}})"
+    croak("could not find template file: $file (include_path: @{$self->{include_path}})")
         unless @st;
-    
+
     # return cached entry after comparing mtime
     if (my $e = $self->{cache}->{$file}) {
         return $e->[1]
@@ -77,7 +77,7 @@ sub build_file {
 
     # read the file, parse, build, cache the entry if necessary, and return
     open my $fh, "<$self->{open_layer}", $filepath
-        or croak "failed to open:$filepath:$!";
+        or croak("failed to open:$filepath:$!");
     my $src = do { local $/; <$fh> };
     close $fh;
     $self->parse($src);
