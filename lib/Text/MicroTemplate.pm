@@ -12,7 +12,7 @@ use 5.00800;
 
 use Scalar::Util;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(encoded_string build_mt render_mt);
 our %EXPORT_TAGS = (

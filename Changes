@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.24
+	- lazy loading of Carp (by Kirill Babikhin) #15
+
 0.23
 	- fix test error on Windows due to the use of unescaped paths in regex patterns (by nanis) #11 #13
 
