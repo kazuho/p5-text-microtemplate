@@ -322,13 +322,15 @@ sub encoded_string {
     Text::MicroTemplate::EncodedString->new($_[0]);
 }
 
+my $_escape_string;
+sub _escape_string {$_escape_string = quotemeta(join('', keys %Text::MicroTemplate::_escape_table))}
 
 sub _inline_escape_html{
     my($variable) = @_;
-
+    _escape_string() unless $_escape_string;
     my $source = qq{
         do{
-            $variable =~ s/([&><"'])/\$Text::MicroTemplate::_escape_table{\$1}/ge;
+            $variable =~ s/([$_escape_string])/\$Text::MicroTemplate::_escape_table{\$1}/ge;
             $variable;
         }
     }; #" for poor editors
@@ -343,7 +345,8 @@ sub escape_html {
         unless defined $str;
     return $str->as_string
         if ref $str eq 'Text::MicroTemplate::EncodedString';
-    $str =~ s/([&><"'])/$_escape_table{$1}/ge; #' for poor editors
+    _escape_string() unless $_escape_string;
+    $str =~ s/([$_escape_string])/$_escape_table{$1}/ge; #' for poor editors
     return $str;
 }
 
