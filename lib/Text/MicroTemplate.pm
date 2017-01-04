@@ -26,6 +26,7 @@ sub new {
         code                => undef,
         comment_mark        => '#',
         expression_mark     => '=',
+        raw_expression_mark => '==',
         line_start          => '?',
         template            => undef,
         tree                => [],
@@ -80,7 +81,7 @@ sub code {
 
 sub _build {
     my $self = shift;
-    
+
     my $escape_func = $self->{escape_func} || '';
 
     my $embed_escape_func = ref($escape_func) eq 'CODE'
@@ -107,7 +108,7 @@ sub _build {
                 ] .= "\$_MT .=\"$last_text\";";
                 undef $last_text;
             }
-            
+
             # Need to fix line ending?
             my $newline = chomp $value;
 
@@ -141,6 +142,13 @@ sub _build {
                 }
                 $lines[-1] .= "\$_MT_T = $value;\$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : $escaped; \$_MT_T = '';";
             }
+            # Raw Expression
+            if ($type eq 'raw_expr') {
+                if ($newline && $value =~ /\n/) {
+                    $value .= "\n"; # temporary workaround for t/13-heredoc.t
+                }
+                $lines[-1] .= "\$_MT_T = $value; \$_MT .= ref \$_MT_T eq 'Text::MicroTemplate::EncodedString' ? \$\$_MT_T : \$_MT_T; \$_MT_T = '';";
+            }
         }
     }
 
@@ -152,7 +160,7 @@ sub _build {
     if (defined $last_text) {
         $lines[-1] .= "\$_MT .=\"$last_text\";";
     }
-    
+
     # Wrap
     $lines[0]   = q/sub { my $_MT = ''; local $/ . $self->{package_name} . q/::_MTREF = \$_MT; my $_MT_T = '';/ . (@lines ? $lines[0] : '');
     $lines[-1] .= q/return $_MT; }/;
@@ -176,6 +184,7 @@ sub parse {
     my $tag_end       = quotemeta $self->{tag_end};
     my $cmnt_mark     = quotemeta $self->{comment_mark};
     my $expr_mark     = quotemeta $self->{expression_mark};
+    my $raw_expr_mark = quotemeta $self->{raw_expression_mark};
 
     # Tokenize
     my $state = 'text';
@@ -188,7 +197,7 @@ sub parse {
             shift @lines;
             $newline = 1;
         }
-        
+
         if ($state eq 'text') {
             # Perl line without return value
             if ($line =~ /^$line_start\s+(.*)$/) {
@@ -203,6 +212,14 @@ sub parse {
                 ];
                 next;
             }
+            if ($line =~ /^$line_start$raw_expr_mark\s+(.+)$/) {
+                push @{$self->{tree}}, [
+                    'raw_expr', $1,
+                    $newline ? ('text', "\n") : (),
+                ];
+                next;
+            }
+
             # Comment line, dummy token needed for line count
             if ($line =~ /^$line_start$cmnt_mark/) {
                 push @{$self->{tree}}, [];
@@ -229,6 +246,8 @@ sub parse {
         # Mixed line
         for my $token (split /
             (
+                $tag_start$raw_expr_mark # Expression
+            |
                 $tag_start$expr_mark     # Expression
             |
                 $tag_start$cmnt_mark     # Comment
@@ -250,6 +269,9 @@ sub parse {
                 next;
             } elsif ($token =~ /^$tag_start$cmnt_mark$/) {
                 $state = 'cmnt';
+                next;
+            } elsif ($token =~ /^$tag_start$raw_expr_mark$/) {
+                $state = 'raw_expr';
                 next;
             } elsif ($token =~ /^$tag_start$expr_mark$/) {
                 $state = 'expr';
@@ -276,14 +298,14 @@ sub parse {
     }
     push @{$self->{tree}}, $tokens
         if @$tokens;
-    
+
     return $self;
 }
 
 sub _context {
     my ($self, $text, $line) = @_;
     my @lines  = split /\n/, $text;
-    
+
     join '', map {
         0 < $_ && $_ <= @lines ? sprintf("%4d: %s\n", $_, $lines[$_ - 1]) : ''
     } ($line - 2) .. ($line + 2);
@@ -292,13 +314,13 @@ sub _context {
 # Debug goodness
 sub _error {
     my ($self, $error, $line_offset, $from) = @_;
-    
+
     # Line
     if ($error =~ /^(.*)\s+at\s+\(eval\s+\d+\)\s+line\s+(\d+)/) {
         my $reason = $1;
         my $line   = $2 - $line_offset;
         my $delim  = '-' x 76;
-        
+
         my $report = "$reason at line $line in template passed from $from.\n";
         my $template = $self->_context($self->{template}, $line);
         $report .= "$delim\n$template$delim\n";
