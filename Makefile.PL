@@ -1,3 +1,4 @@
+BEGIN { push @INC, '.' unless $INC[-1] eq '.' }
 use inc::Module::Install;
 
 name 'Text-MicroTemplate';
