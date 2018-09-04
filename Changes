@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::MicroTemplate
 
+0.xx
+    - Add support for no . in @INC for Makefile.PL on perl >= 5.26
+
 0.24
 	- lazy loading of Carp (by Kirill Babikhin) #15
 
